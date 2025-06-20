@@ -29,7 +29,7 @@ function add_checkout_js_script() {
             // Append the coupon form to the new checkout sidebar
             checkoutSidebar.prepend(couponToggle);
             checkoutSidebar.prepend(couponForm);
-            
+
 
             // Insert the checkout sidebar (which now includes the coupon form) before the review order table
             checkoutSidebar.append(checkoutReviewOrderTable);
@@ -127,12 +127,12 @@ add_action('wp_ajax_nopriv_update_cart_quantity', 'update_cart_quantity_ajax');
 
 
 function default_billing_details(){
-    
+
     if (is_user_logged_in()) {
         $user_id = get_current_user_id();
 
-        
-        
+
+
         // Get user billing details
         $company    = get_user_meta($user_id, 'billing_company', true);
         $first_name = get_user_meta($user_id, 'billing_first_name', true);
@@ -140,13 +140,13 @@ function default_billing_details(){
         $address_1  = get_user_meta($user_id, 'billing_address_1', true);
         $postcode   = get_user_meta($user_id, 'billing_postcode', true);
         $city       = get_user_meta($user_id, 'billing_city', true);
-        
+
         // Output the details
         echo '<div class="custom-billing-info">';
         echo '<h3>Rechnungsadresse</h3>';
         if($company){
             echo '<p>' . esc_html($company) . '</p>';
-        }  
+        }
         echo '<p>' . esc_html($first_name) . ' ' . esc_html($last_name) . '</p>';
         echo '<p>' . esc_html($address_1) . '</p>';
         echo '<p>' . esc_html($postcode) . ', ' . esc_html($city) .'</p>';
@@ -244,9 +244,9 @@ add_action('woocommerce_cart_calculate_fees', function() {
     if ($discount_percentage && is_numeric($discount_percentage) && $discount_percentage > 0) {
         $cart = WC()->cart;
         $discount_amount = ($cart->subtotal_ex_tax * $discount_percentage) / 100;
-        
+
         // Apply the discount as a negative fee (before tax) with percentage in label
-        $cart->add_fee(sprintf(__('Ihr Rabatt (%d%%)', 'your-textdomain'), $discount_percentage), -$discount_amount, false);
+        $cart->add_fee(sprintf(__('Ihr Rabatt (%.2f%%)', 'your-textdomain'), $discount_percentage), -$discount_amount, false);
     }
 });
 
@@ -286,7 +286,7 @@ add_filter( 'woocommerce_get_terms_and_conditions_checkbox_text', 'custom_german
 function custom_german_terms_text( $text ) {
     $terms_url = home_url('/allgemeine-geschaeftsbedingungen/');
     $privacy_url = home_url('/datenschutzrichtlinie/');
-    
+
     return sprintf(
         __( 'Ich habe die <a href="%s" target="_blank">AGB</a> und <a href="%s" target="_blank">Datenschutzerklärung</a> gelesen und stimme ihnen zu', 'woocommerce' ),
         esc_url( $terms_url ),
