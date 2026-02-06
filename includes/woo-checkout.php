@@ -1,13 +1,4 @@
 <?php
-remove_action('woocommerce_checkout_order_review', 'woocommerce_order_review', 10);
-add_action('woocommerce_after_checkout_form', 'woocommerce_order_review', 100);
-
-
-add_action('woocommerce_before_checkout_form', 'add_cart_to_checkout_before_customer_details');
-
-function add_cart_to_checkout_before_customer_details() {
-    echo do_shortcode('[woocommerce_cart]');
-}
 
 
 
@@ -29,7 +20,7 @@ function add_checkout_js_script() {
             // Append the coupon form to the new checkout sidebar
             checkoutSidebar.prepend(couponToggle);
             checkoutSidebar.prepend(couponForm);
-            
+
 
             // Insert the checkout sidebar (which now includes the coupon form) before the review order table
             checkoutSidebar.append(checkoutReviewOrderTable);
@@ -126,130 +117,6 @@ add_action('wp_ajax_nopriv_update_cart_quantity', 'update_cart_quantity_ajax');
 
 
 
-function default_billing_details(){
-    
-    if (is_user_logged_in()) {
-        $user_id = get_current_user_id();
-
-        
-        
-        // Get user billing details
-        $company    = get_user_meta($user_id, 'billing_company', true);
-        $first_name = get_user_meta($user_id, 'billing_first_name', true);
-        $last_name  = get_user_meta($user_id, 'billing_last_name', true);
-        $address_1  = get_user_meta($user_id, 'billing_address_1', true);
-        $postcode   = get_user_meta($user_id, 'billing_postcode', true);
-        $city       = get_user_meta($user_id, 'billing_city', true);
-        
-        // Output the details
-        echo '<div class="custom-billing-info">';
-        echo '<h3>Rechnungsadresse</h3>';
-        if($company){
-            echo '<p>' . esc_html($company) . '</p>';
-        }  
-        echo '<p>' . esc_html($first_name) . ' ' . esc_html($last_name) . '</p>';
-        echo '<p>' . esc_html($address_1) . '</p>';
-        echo '<p>' . esc_html($postcode) . ', ' . esc_html($city) .'</p>';
-        echo '</div>';
-    }
-}
-add_action('woocommerce_before_checkout_billing_form', 'default_billing_details');
-
-
-add_filter( 'woocommerce_checkout_fields', function( $fields ) {
-    unset( $fields['billing']['billing_state'] );
-    unset( $fields['shipping']['shipping_state'] );
-
-    return $fields;
-});
-
-
-
-add_action( 'woocommerce_review_order_before_submit', function() {
-    echo '<p class="totalvalue"><strong>Gesamtsumme: </strong><span>' . WC()->cart->get_total() . '</span></p>';
-});
-
-
-
-
-
-// Display "Kommission" field before the shipping form on the checkout page
-add_action( 'woocommerce_before_checkout_billing_form', 'display_custom_kommission_field', 1 );
-function display_custom_kommission_field() {
-    // Define the field parameters
-    $field_args = array(
-        'type'        => 'text',
-        'label'       => __( 'Kommission', 'your-text-domain' ),
-        'placeholder' => __( '', 'your-text-domain' ),
-        'required'    => false,
-        'class'       => array( 'form-row-wide' ),
-        'clear'       => true,
-    );
-
-    // Output the field using WooCommerce's form field helper
-    woocommerce_form_field( 'billing_kommission', $field_args, WC()->checkout->get_value( 'billing_komission' ) );
-}
-
-
-
-
-
-// Save the "Kommission" field value in order meta
-add_action( 'woocommerce_checkout_update_order_meta', function( $order_id ) {
-    if ( ! empty( $_POST['billing_kommission'] ) ) {
-        $order = wc_get_order( $order_id );
-        $order->update_meta_data( 'billing_kommission', sanitize_text_field( $_POST['billing_kommission'] ) );
-        $order->save();
-    }
-});
-
-
-
-// Display "Kommission" field in the WooCommerce admin order details
-add_action( 'woocommerce_admin_order_data_after_billing_address', function( $order ) {
-    $kommission = $order->get_meta( 'billing_kommission' );
-    if ( ! empty( $kommission ) ) {
-        echo '<p><strong>' . __( 'Kommission', 'your-text-domain' ) . ':</strong> ' . esc_html( $kommission ) . '</p>';
-    }
-});
-
-add_action( 'woocommerce_order_details_after_order_table', function( $order ) {
-    if ( is_user_logged_in() ) {
-        $kommission = $order->get_meta( 'billing_kommission' );
-        if ( ! empty( $kommission ) ) {
-            echo '<p><strong>' . __( 'Kommission', 'your-text-domain' ) . ':</strong> ' . esc_html( $kommission ) . '</p>';
-        }
-    }
-});
-
-
-
-
-
-
-
-
-
-
-add_action('woocommerce_cart_calculate_fees', function() {
-    if (is_admin() && !defined('DOING_AJAX')) return;
-
-    // Get the current user
-    $user_id = get_current_user_id();
-    if (!$user_id) return;
-
-    // Get the ACF discount field
-    $discount_percentage = get_field('discount', 'user_' . $user_id);
-
-    if ($discount_percentage && is_numeric($discount_percentage) && $discount_percentage > 0) {
-        $cart = WC()->cart;
-        $discount_amount = ($cart->subtotal_ex_tax * $discount_percentage) / 100;
-        
-        // Apply the discount as a negative fee (before tax) with percentage in label
-        $cart->add_fee(sprintf(__('Ihr Rabatt (%.2f%%)', 'your-textdomain'), $discount_percentage), -$discount_amount, false);
-    }
-});
-
 
 
 
@@ -281,26 +148,3 @@ function redirect_empty_cart_to_shop() {
 
 
 
-/** Custom text for accept terms and conditions **/
-add_filter( 'woocommerce_get_terms_and_conditions_checkbox_text', 'custom_german_terms_text' );
-function custom_german_terms_text( $text ) {
-    $terms_url = home_url('/allgemeine-geschaeftsbedingungen/');
-    $privacy_url = home_url('/datenschutzrichtlinie/');
-    
-    return sprintf(
-        __( 'Ich habe die <a href="%s" target="_blank">AGB</a> und <a href="%s" target="_blank">Datenschutzerklärung</a> gelesen und stimme ihnen zu', 'woocommerce' ),
-        esc_url( $terms_url ),
-        esc_url( $privacy_url )
-    );
-}
-
-
-/**
- * Hide bank details for BACS
- */
-add_filter('woocommerce_bacs_account_fields', 'hide_bacs_account_details', 10, 2);
-
-function hide_bacs_account_details($account_fields, $order_id) {
-    // Return an empty array to hide all bank accounts
-    return array();
-}

@@ -1,9 +1,9 @@
 /*
-	Theme Name: LedLedeni custom theme
+	Theme Name: Superprotein custom theme
 	Description: Custom WordPress Theme
 	Version: 1.0.0
-	Author: EtonDigital
-    Url: https://www.etondigital.com/
+	Author: Milan Nikolic
+    Url: https://www.nikolic.win/
 	Tags: Gutenberg, HTML5, CSS3
 	License: MIT
 */
@@ -15,5 +15,8 @@
 @import 'blocks';
 @import 'gutenberg';
 @import 'forms';
-@import 'woocommerce';
-@import 'references';
+@import 'buttons';
+@import 'woocommerce-single';
+@import 'woocommerce-category';
+@import 'woocommerce-loop-product';
+//@import 'woocommerce';

@@ -1,0 +1,113 @@
+ul.products.columns-4 {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 3.2rem;
+    list-style: none;
+
+    li {
+        width: 100%;
+        max-width: 100%!important;
+        background-color: $white;
+        text-align: center;
+        border-radius: 2.4rem;
+        padding: 2.4rem;
+        margin: 0!important;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: .8rem;
+        border: 1px solid $lightgray-color;
+        transition: all .23s ease-in-out;
+
+        &:hover {
+            border-color: $cta-color;
+        }
+
+        a {
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .onsale {
+            position: absolute;
+            left: 0;
+            top: 0;
+            border-top-left-radius: 2.4rem;
+            padding: .8rem 1.6rem .8rem 2.4rem;
+            white-space: nowrap;
+            width: fit-content!important;
+            border-bottom: 2px solid $cta-color;
+            background-color: $accent-color;
+            color: $primary-color;
+        }
+
+        .woocommerce-loop-product__link {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+
+            &:hover {
+                h2 {
+                    opacity: .8;
+                }
+            }
+
+            h2 {
+                text-align: center;
+                margin-bottom: 0;
+                font-size: 2rem;
+                letter-spacing: 0;
+                color: $primary-color;
+            }
+        }
+
+        .price {
+            margin: 0!important;
+            color: $secondary-color;
+            font-size: 2rem;
+            font-weight: 600;
+            font-family: $alt-font;
+
+            del {
+                font-size: 1.6rem;
+            }
+
+            ins {
+                text-decoration: none;
+            }
+        }
+
+        .button {
+            display: flex;
+            width: 100%;
+            margin-top: auto;
+            border:none;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: $alt-font;
+            font-size: 1.4rem!important;
+            border-radius: 1.6rem;
+            padding: .8rem 1.6rem;
+            cursor: pointer;
+            transition: all .33s ease-in-out;
+            background-color: $accent-color!important;
+
+            &:hover {
+                background-color: darken($accent-color, 10%)!important;
+            }
+        }
+    }
+}
+
+
+@media only screen and (min-width:768px) {
+    ul.products.columns-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media only screen and (min-width:1200px) {
+    ul.products.columns-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

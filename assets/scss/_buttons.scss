@@ -1,0 +1,18 @@
+.button {
+    color: $primary-color;
+    text-align: center;
+    font-family: $alt-font;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 4.8rem;
+    font-size: 1.4rem;
+    transition: all .23s ease-in-out;
+    background-color: $accent-color;
+    padding: .8rem 2.4rem;
+
+    &:hover {
+        background-color: darken($accent-color, 5%);
+    }
+}

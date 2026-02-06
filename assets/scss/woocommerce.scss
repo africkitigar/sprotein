@@ -1,5 +1,16 @@
 @import 'variables';
 
+.woocommerce span.onsale {
+    background-color: $accent-color;
+    color: $primary-color;
+    width: 5rem;
+    height: 5rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .my-account:not(.logged-in) {
     .page-content {
         background: url(assets/images/account-cover.jpg) no-repeat;
@@ -590,35 +601,7 @@ ul.products {
         
     }
 
-    .woocommerce-product-gallery {
-        display: flex;
-        flex-direction: row-reverse;
-        align-items: center;
-        gap: 2rem;
-        width: calc(100% - 65rem)!important;
 
-        .flex-viewport {
-            flex:1;
-        }
-
-        .flex-control-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            width: 7.2rem;
-
-            li {
-                width: 100%!important;
-
-                img {
-                    border-radius: 6px;
-                    border: 1px solid #5E6266;
-                    background: #FFF;
-                }
-            }
-            
-        }
-    }
     .woocommerce-content {
         > .product {
             .summary {

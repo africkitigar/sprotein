@@ -26,6 +26,7 @@ body {
     -ms-flex-direction: column;
     flex-direction: column;
     transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: $secondary-color;
 }
 body::-webkit-scrollbar-track,
 .modal-inner::-webkit-scrollbar-track,
@@ -42,7 +43,7 @@ body::-webkit-scrollbar,
 body::-webkit-scrollbar-thumb,
 .modal-inner::-webkit-scrollbar-thumb,
 .dropdown-options::-webkit-scrollbar-thumb {
-    background-color:$secondary-color;
+    background-color:$cta-color;
 }
 
 /* wrapper */
@@ -52,11 +53,18 @@ body::-webkit-scrollbar-thumb,
     flex: 1 0 auto;
     position: relative;
 }
+.body-content {
+    border-radius: 3.2rem;
+    margin: -2.4rem .8rem;
+    background-color: #fff;
+    z-index: 23;
+    position: relative;
+}
 .container,
 .container-narrow,
 .container-wide {
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.6rem;
 }
 
 .container {

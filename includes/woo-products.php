@@ -30,28 +30,72 @@ function custom_woocommerce_result_count()
 }
 
 
-function custom_product_search_form()
-{
-    $current_category = get_queried_object(); // Get the current category (if on a category page)
-    $category_id = (isset($current_category->term_id)) ? $current_category->term_id : '';
 
-    $form = '<form role="search" method="get" class="woocommerce-product-search" action="' . esc_url(home_url('/')) . '">
-        <label class="screen-reader-text" for="woocommerce-product-search-field">' . esc_html__('Search for:', 'woocommerce') . '</label>
-        <input type="search" id="woocommerce-product-search-field" autocomplete="off" class="search-field" placeholder="' . esc_attr__('Suche nach Produkten', 'woocommerce') . '" value="' . get_search_query() . '" name="s" />
-        <input type="hidden" name="post_type" value="product" />';
+/**
+ * Move Woo "On sale" badge from gallery to summary and show % discount.
+ */
+add_action('init', function () {
+  // Remove default sale flash from gallery area
+  remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
 
-    // Add category filter if on a category page
-    if ($category_id) {
-        $form .= '<input type="hidden" name="product_cat" value="' . esc_attr($current_category->slug) . '" />';
+  // Add our custom badge in summary (before title)
+  add_action('woocommerce_single_product_summary', 'my_sale_percentage_badge_in_summary', 4);
+});
+
+function my_sale_percentage_badge_in_summary() {
+  if ( ! function_exists('wc_get_product') ) return;
+
+  global $product;
+  if ( ! $product instanceof WC_Product ) return;
+
+  if ( ! $product->is_on_sale() ) return;
+
+  $percentage = my_get_discount_percentage($product);
+  if ( $percentage <= 0 ) return;
+
+  // If variable product, you can show "Up to -xx%"
+  $label = $product->is_type('variable')
+    ? sprintf('Up to -%d%%', $percentage)
+    : sprintf('-%d%%', $percentage);
+
+  echo '<div class="my-onsale-badge" aria-label="Sale badge">'.$label.'</div>';
+}
+
+function my_get_discount_percentage( WC_Product $product ): int {
+  // Simple / external (with sale)
+  if ( $product->is_type('simple') || $product->is_type('external') ) {
+    $regular = (float) $product->get_regular_price();
+    $sale    = (float) $product->get_sale_price();
+
+    if ( $regular > 0 && $sale > 0 && $sale < $regular ) {
+      return (int) round( ( ( $regular - $sale ) / $regular ) * 100 );
+    }
+    return 0;
+  }
+
+  // Variable: find max % across on-sale variations
+  if ( $product->is_type('variable') ) {
+    $max = 0;
+
+    foreach ( $product->get_children() as $variation_id ) {
+      $variation = wc_get_product($variation_id);
+      if ( ! $variation || ! $variation->is_on_sale() ) continue;
+
+      $regular = (float) $variation->get_regular_price();
+      $sale    = (float) $variation->get_sale_price();
+
+      if ( $regular > 0 && $sale > 0 && $sale < $regular ) {
+        $pct = (int) round( ( ( $regular - $sale ) / $regular ) * 100 );
+        if ( $pct > $max ) $max = $pct;
+      }
     }
 
-    $form .= '<button type="submit" value="' . esc_attr__('Search', 'woocommerce') . '"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
-  <path d="M28.7078 27.2928L22.449 21.0353C24.2631 18.8574 25.1676 16.064 24.9746 13.2362C24.7815 10.4084 23.5057 7.76385 21.4125 5.85275C19.3193 3.94164 16.5698 2.9111 13.7362 2.9755C10.9025 3.0399 8.20274 4.19429 6.19851 6.19851C4.19429 8.20274 3.0399 10.9025 2.9755 13.7362C2.9111 16.5698 3.94164 19.3193 5.85275 21.4125C7.76385 23.5057 10.4084 24.7815 13.2362 24.9746C16.064 25.1676 18.8574 24.2631 21.0353 22.449L27.2928 28.7078C27.3857 28.8007 27.496 28.8744 27.6174 28.9247C27.7388 28.975 27.8689 29.0008 28.0003 29.0008C28.1317 29.0008 28.2618 28.975 28.3832 28.9247C28.5046 28.8744 28.6149 28.8007 28.7078 28.7078C28.8007 28.6149 28.8744 28.5046 28.9247 28.3832C28.975 28.2618 29.0008 28.1317 29.0008 28.0003C29.0008 27.8689 28.975 27.7388 28.9247 27.6174C28.8744 27.496 28.8007 27.3857 28.7078 27.2928ZM5.00029 14.0003C5.00029 12.2203 5.52813 10.4802 6.51706 9.00015C7.50599 7.52011 8.9116 6.36656 10.5561 5.68537C12.2007 5.00418 14.0103 4.82595 15.7561 5.17322C17.5019 5.52048 19.1056 6.37765 20.3642 7.63632C21.6229 8.895 22.4801 10.4986 22.8274 12.2445C23.1746 13.9903 22.9964 15.7999 22.3152 17.4444C21.634 19.089 20.4805 20.4946 19.0004 21.4835C17.5204 22.4724 15.7803 23.0003 14.0003 23.0003C11.6141 22.9976 9.3265 22.0486 7.63925 20.3613C5.95199 18.6741 5.00293 16.3864 5.00029 14.0003Z" fill="black"/>
-</svg></button>
-    </form>';
+    return $max;
+  }
 
-    return $form;
+  return 0;
 }
+
 
 
 
@@ -78,38 +122,7 @@ add_action('woocommerce_shop_loop_item_title', 'display_product_categories_in_lo
 
 
 
-add_filter('woocommerce_loop_add_to_cart_link', 'custom_add_to_cart_button_for_logged_out_users', 10, 3);
 
-function custom_add_to_cart_button_for_logged_out_users($button, $product, $args)
-{
-    // Check if the user is not logged in
-    if (!is_user_logged_in()) {
-        // Replace the button with a link to /kontakt and text "Anmelden für Preis"
-        $button = sprintf(
-            '<a href="%s" class="button">%s</a>',
-            esc_url(home_url('/kontakt')), // Link to /kontakt
-            esc_html__('Preis sichtbar nach Login', 'your-text-domain') // Button text
-        );
-    }
-
-    return $button;
-}
-
-add_filter('woocommerce_get_price_html', 'hide_price_for_guest_users', 10, 2);
-
-function hide_price_for_guest_users($price, $product) {
-    if (!is_user_logged_in() && is_product()) {
-        return '<a class="btn" href="' . esc_url(home_url('/kontakt')) . '">Preis sichtbar nach Login</a>';
-    }
-    return $price;
-}
-
-function remove_add_to_cart_for_guest_users() {
-    if (!is_user_logged_in() && is_product()) {
-        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30);
-    }
-}
-add_action('wp', 'remove_add_to_cart_for_guest_users');
 
 
 
@@ -137,22 +150,6 @@ function custom_woocommerce_pagination_svg_arrows($args)
 
 
 
-add_action('woocommerce_after_shop_loop_item_title', 'hide_prices_for_logged_out_users', 9);
-
-function hide_prices_for_logged_out_users()
-{
-    // Check if the user is not logged in
-    if (!is_user_logged_in()) {
-        // Remove the price display
-        remove_action('woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price', 10);
-
-        // Display a custom message
-        // echo '<p class="login-to-see-price">' . esc_html__('Login to see prices', 'your-text-domain') . '</p>';
-    }
-}
-
-
-
 
 // Move short description after the title on single product page
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
@@ -168,11 +165,10 @@ remove_action('woocommerce_single_product_summary', 'woocommerce_template_single
 // Remove WooCommerce product tabs from default position
 remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10);
 
-// Remove the default WooCommerce tabs
-remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10);
+add_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 1);
 
 // Add the tabs after product summary with accordion structure
-add_action('woocommerce_after_single_product_summary', 'custom_woocommerce_output_product_tabs', 1);
+/*add_action('woocommerce_after_single_product_summary', 'custom_woocommerce_output_product_tabs', 1);
 
 function custom_woocommerce_output_product_tabs()
 {
@@ -184,59 +180,9 @@ function custom_woocommerce_output_product_tabs()
     // Get all product attributes
     $attributes = $product->get_attributes();
 
-    if (!empty($tabs) || !empty(get_field('mfn-page-items-seo')) || !empty( $attributes )) {
+    if (!empty($tabs)  || !empty( $attributes )) {
         echo '<div class="woocommerce-accordion-tabs">';
-        if(get_field('mfn-page-items-seo') || !empty( $attributes )){
-            echo '<div class="accordion mfn-page-items">
-            <div class="accordion-title opened" data-tab-key="technical">Technische Daten</div>
-            <div class="accordion-content" id="content-technical">' . get_field('mfn-page-items-seo');
-        }
 
-       
-        
-        if ( ! empty( $attributes ) && empty(get_field('mfn-page-items-seo')) ) {
-            $product = wc_get_product(get_the_ID());
-            $categories = wp_get_post_terms($product->get_id(), 'product_cat');
-
-            if (!empty($categories)) {
-                // Assuming the first category is the main category
-                $main_category = $categories[0]->name;
-                echo '<p><strong>Artikelgruppe</strong> '. $main_category .'</p>';
-            }
-
-            echo '<p><strong>Artikelbezeichnung</strong> '. get_the_title() .'</p>';
-
-            $sku = $product->get_sku();
-            if (!empty($sku)) {
-                echo '<p class="product-sku"><strong>Artikelcode</strong> ' . esc_html($sku) . '</p>';
-            }
-
-            
-
-            foreach ( $attributes as $attribute ) {
-                // Skip if this attribute is used for variations
-                if ( $attribute->get_variation() ) {
-                    continue;
-                }
-        
-                // Get attribute name
-                $attribute_name = $attribute->get_name();
-                
-                // Get attribute values
-                if ( $attribute->is_taxonomy() ) {
-                    // For taxonomy-based attributes (e.g., color, size)
-                    $terms = wc_get_product_terms( $product->get_id(), $attribute_name, array( 'fields' => 'names' ) );
-                    $attribute_value = implode( ', ', $terms );
-                } else {
-                    // For custom attributes (manually added)
-                    $attribute_value = $product->get_attribute( $attribute_name );
-                }
-                
-                // Display attribute name & value
-                echo '<p><strong>' . esc_html( wc_attribute_label( $attribute_name ) ) . '</strong> ' . esc_html( $attribute_value ) . '</p>';
-            }
-        } 
-        echo '</div></div>';//technical content
 
         foreach ($tabs as $key => $tab) {
             // Output the tab title with the "accordion-title" class
@@ -254,49 +200,23 @@ function custom_woocommerce_output_product_tabs()
         }//endoforeach 
 
         ?>
-        <?php if( have_rows('manuals') ): ?>
-            <div class="accordion"><div class="accordion-title">Dokumente & Downloads</div>
-            <div class="accordion-content">
-        <?php while( have_rows('manuals') ): the_row(); 
-            $file = get_sub_field('file');
-            if( $file ):
-                $file_url = $file['url'];
-                $file_name = $file['filename']; // or use $file['title'] or $file['name']
-        ?>
-            
-                <div class="wp-block-button is-style-btn-arrow">
-                <a class="wp-block-button__link wp-element-button" href="<?php echo esc_url($file_url); ?>" download>
 
-                    
-                    <?php echo esc_html($file_name); ?>
-                </a>
-                </div>
-        <?php endif; endwhile; ?>
-        </div></div>
-        <?php endif; ?>
 
         <?php
 
         echo '</div>'; // End of woocommerce-accordion-tabs
     }
 }
+*/
+
+remove_action(
+  'woocommerce_after_single_product_summary',
+  'woocommerce_upsell_display',
+  15
+);
 
 
-add_filter( 'woocommerce_product_tabs', 'custom_upsells_product_tab' );
-function custom_upsells_product_tab( $tabs ) {
-    global $product;
-
-    if ( $product->get_upsell_ids() ) {
-        $tabs['upsells_tab'] = array(
-            'title'    => __( 'Zubehör', 'woocommerce' ),
-            'priority' => 50,
-            'callback' => 'custom_upsells_product_tab_content'
-        );
-    }
-
-    return $tabs;
-}
-
+add_action('woocommerce_after_single_product_summary', 'custom_upsells_product_tab_content', 2);
 function custom_upsells_product_tab_content() {
     global $product;
 
@@ -314,12 +234,15 @@ function custom_upsells_product_tab_content() {
         $upsell_loop = new WP_Query( $args );
 
         if ( $upsell_loop->have_posts() ) {
+            echo '<div class="upsell-products">';
+            echo '<h3>Upsells</h3>';
             woocommerce_product_loop_start();
             while ( $upsell_loop->have_posts() ) {
                 $upsell_loop->the_post();
                 wc_get_template_part( 'content', 'product' );
             }
             woocommerce_product_loop_end();
+            echo '</div>';
         }
 
         wp_reset_postdata();
@@ -404,17 +327,6 @@ function custom_related_products_args($args)
 
 
 
-add_filter('woocommerce_get_price_html', 'custom_text_after_price', 10, 2);
-function custom_text_after_price($price, $product)
-{
-    if (is_product()) {
-        $price .= ' <small>exkl. 8.1% MwSt.</small>'; // Change the text as needed
-    }
-    return $price;
-}
-
-
-
 add_action('woocommerce_single_product_summary', 'custom_sku_below_title', 5);
 function custom_sku_below_title()
 {
@@ -451,20 +363,6 @@ add_action('woocommerce_single_product_summary', 'woocommerce_template_single_pr
 
 
 
-add_action('woocommerce_single_product_summary', 'shipping_single_product_banner', 115);
-function shipping_single_product_banner()
-{
-    ?>
-    <div class="shippinig-banner">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M31.6963 14.7225L29.9463 10.3475C29.8173 10.0221 29.5933 9.74302 29.3035 9.54679C29.0136 9.35057 28.6713 9.24627 28.3213 9.2475H23.75V8C23.75 7.80109 23.671 7.61032 23.5303 7.46967C23.3897 7.32902 23.1989 7.25 23 7.25H4C3.53587 7.25 3.09075 7.43437 2.76256 7.76256C2.43437 8.09075 2.25 8.53587 2.25 9V23C2.25 23.4641 2.43437 23.9092 2.76256 24.2374C3.09075 24.5656 3.53587 24.75 4 24.75H6.325C6.49714 25.5977 6.95705 26.3599 7.62681 26.9073C8.29657 27.4547 9.13498 27.7538 10 27.7538C10.865 27.7538 11.7034 27.4547 12.3732 26.9073C13.043 26.3599 13.5029 25.5977 13.675 24.75H20.325C20.4971 25.5977 20.957 26.3599 21.6268 26.9073C22.2966 27.4547 23.135 27.7538 24 27.7538C24.865 27.7538 25.7034 27.4547 26.3732 26.9073C27.043 26.3599 27.5029 25.5977 27.675 24.75H30C30.4641 24.75 30.9092 24.5656 31.2374 24.2374C31.5656 23.9092 31.75 23.4641 31.75 23V15C31.7498 14.9049 31.7316 14.8108 31.6963 14.7225ZM23.75 10.75H28.3225C28.3726 10.75 28.4215 10.7649 28.463 10.793C28.5044 10.8211 28.5365 10.861 28.555 10.9075L29.8925 14.25H23.75V10.75ZM3.75 9C3.75 8.9337 3.77634 8.87011 3.82322 8.82322C3.87011 8.77634 3.9337 8.75 4 8.75H22.25V17.25H3.75V9ZM10 26.25C9.55499 26.25 9.11998 26.118 8.74997 25.8708C8.37996 25.6236 8.09157 25.2722 7.92127 24.861C7.75097 24.4499 7.70642 23.9975 7.79323 23.561C7.88005 23.1246 8.09434 22.7237 8.40901 22.409C8.72368 22.0943 9.12459 21.8801 9.56105 21.7932C9.9975 21.7064 10.4499 21.751 10.861 21.9213C11.2722 22.0916 11.6236 22.38 11.8708 22.75C12.118 23.12 12.25 23.555 12.25 24C12.25 24.5967 12.0129 25.169 11.591 25.591C11.169 26.0129 10.5967 26.25 10 26.25ZM20.325 23.25H13.675C13.5029 22.4023 13.043 21.6401 12.3732 21.0927C11.7034 20.5453 10.865 20.2462 10 20.2462C9.13498 20.2462 8.29657 20.5453 7.62681 21.0927C6.95705 21.6401 6.49714 22.4023 6.325 23.25H4C3.9337 23.25 3.87011 23.2237 3.82322 23.1768C3.77634 23.1299 3.75 23.0663 3.75 23V18.75H22.25V20.685C21.76 20.9443 21.3333 21.3087 21.0005 21.7521C20.6677 22.1956 20.4371 22.707 20.325 23.25ZM24 26.25C23.555 26.25 23.12 26.118 22.75 25.8708C22.38 25.6236 22.0916 25.2722 21.9213 24.861C21.751 24.4499 21.7064 23.9975 21.7932 23.561C21.8801 23.1246 22.0943 22.7237 22.409 22.409C22.7237 22.0943 23.1246 21.8801 23.561 21.7932C23.9975 21.7064 24.4499 21.751 24.861 21.9213C25.2722 22.0916 25.6236 22.38 25.8708 22.75C26.118 23.12 26.25 23.555 26.25 24C26.25 24.5967 26.0129 25.169 25.591 25.591C25.169 26.0129 24.5967 26.25 24 26.25ZM30.25 23C30.25 23.0663 30.2237 23.1299 30.1768 23.1768C30.1299 23.2237 30.0663 23.25 30 23.25H27.675C27.501 22.4035 27.0405 21.6429 26.371 21.0964C25.7016 20.5499 24.8642 20.251 24 20.25C23.9163 20.25 23.8325 20.25 23.75 20.2588V15.75H30.25V23Z"
-                fill="#89BE0D" />
-        </svg>
-        Kostenlose Lieferung innerhalb der Schweiz
-    </div>
-    <?php
-}
 
 
 
@@ -510,33 +408,10 @@ function change_view_cart_url_after_add_to_cart($fragments) {
 
 function change_add_to_cart_button_text($text) {
     if (WC()->cart->get_cart_contents_count() > 0) {
-        return __('Proceed to Checkout', 'woocommerce');
+        return __('Nastavite na plaćanje', 'woocommerce');
     }
     return $text; // Default 'Add to Cart' text
 }
-
-
-
-/**
- * Summary of footer_banner_in_shop
- * Add global pattern as footer banner
- */
-function footer_banner_in_shop(){
-    $block_pattern_id = 331;
-
-    // Get the post content of the Gutenberg block pattern
-    $block_pattern_post = get_post($block_pattern_id);
-
-    if ($block_pattern_post && $block_pattern_post->post_type === 'wp_block') {
-        // Access the block content
-        $block_content = $block_pattern_post->post_content;
-
-        // Output the block content
-        echo apply_filters('the_content', $block_content);
-    }
-}
-add_action('woocommerce_after_single_product', 'footer_banner_in_shop', 1);
-
 
 
 
@@ -550,7 +425,7 @@ add_filter('wc_add_to_cart_message_html', function ($message, $products) {
     $checkout_url = wc_get_checkout_url(); // Get checkout page URL
 
     // Replace the cart link with the checkout link
-    $message = preg_replace('/<a.*?class="button wc-forward".*?>.*?<\/a>/', '<a href="' . esc_url($checkout_url) . '" class="button wc-forward">Zur Kasse</a>', $message);
+    $message = preg_replace('/<a.*?class="button wc-forward".*?>.*?<\/a>/', '<a href="' . esc_url($checkout_url) . '" class="button wc-forward">Idi na plaćanje</a>', $message);
 
     return $message;
 }, 10, 2);
@@ -661,89 +536,6 @@ add_filter('use_block_editor_for_post_type', 'enable_gutenberg_for_products', 10
 
 
 
-/**
- * Apply user-specific discount from ACF field to product prices
- */
-/*add_filter('woocommerce_product_get_price', 'apply_user_discount_to_price', 10, 2);
-add_filter('woocommerce_product_get_regular_price', 'apply_user_discount_to_price', 10, 2);
-add_filter('woocommerce_product_variation_get_price', 'apply_user_discount_to_price', 10, 2);
-add_filter('woocommerce_product_variation_get_regular_price', 'apply_user_discount_to_price', 10, 2);
-
-function apply_user_discount_to_price($price, $product) {
-    // Only for logged-in users
-    if (!is_user_logged_in() || empty($price)) {
-        return $price;
-    }
-
-    // Get current user ID
-    $user_id = get_current_user_id();
-
-    // Get discount percentage from ACF user field
-    $discount_percentage = get_field('discount', 'user_' . $user_id);
-
-    // If discount exists and is numeric
-    if (!empty($discount_percentage) && is_numeric($discount_percentage) && $discount_percentage > 0) {
-        // Ensure price is treated as float
-        $price_float = (float) $price;
-        $discount_float = (float) $discount_percentage;
-        
-        // Calculate discounted price
-        $discounted_price = $price_float * (1 - ($discount_float / 100));
-        
-        // Return discounted price rounded to 2 decimals
-        return round($discounted_price, 2);
-    }
-
-    return $price;
-}*/
-
-/**
- * Display the original price crossed out and the discounted price
- */
-/*add_filter('woocommerce_get_price_html', 'display_discounted_price_html', 10, 2);
-
-function display_discounted_price_html($price_html, $product) {
-    // Only for logged-in users
-    if (!is_user_logged_in()) {
-        return $price_html;
-    }
-
-    // Get current user ID
-    $user_id = get_current_user_id();
-
-    // Get discount percentage from ACF user field
-    $discount_percentage = get_field('discount', 'user_' . $user_id);
-
-    // If discount exists and is numeric
-    if (!empty($discount_percentage) && is_numeric($discount_percentage) && $discount_percentage > 0) {
-        $regular_price = (float) $product->get_regular_price();
-        $discounted_price = (float) $product->get_price();
-        
-        // Only modify if there's a difference
-        if ($regular_price > 0 && $regular_price != $discounted_price) {
-            $price_html = '<del>' . wc_price($regular_price) . '</del> <ins>' . wc_price($discounted_price) . '</ins>';
-        }
-    }
-
-    return $price_html;
-}*/
-
-
-
-/**
- * Add "per meter" text next to price for products in category ID 111 when language is German
- */
-add_filter('woocommerce_get_price_html', 'add_per_meter_to_price', 10, 2);
-
-function add_per_meter_to_price($price, $product) {
-
-    if (has_term(111, 'product_cat', $product->get_id()) || has_term(128, 'product_cat', $product->get_id())) {
-        $price .= ' <span class="per-meter">/ pro Meter</span>';
-    }
-
-    return $price;
-}
-
 
 
 
@@ -751,12 +543,13 @@ function add_per_meter_to_price($price, $product) {
 /**
  * Completely remove WooCommerce upsell products
  */
+/*
 function remove_woocommerce_upsells() {
     remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
 }
 add_action( 'woocommerce_after_single_product_summary', 'remove_woocommerce_upsells', 1 );
 
-
+*/
 
 
 
@@ -908,11 +701,341 @@ function custom_variable_price_if_price_range($price, $product) {
 
 
 
-add_filter('woocommerce_get_availability', 'custom_out_of_stock_message', 10, 2);
 
-function custom_out_of_stock_message($availability, $product) {
-    if (!$product->is_in_stock()) {
-        $availability['availability'] = 'Verfügbarkeit auf Anfrage – bitte kontaktieren Sie uns: 044 203 96 97';
+
+add_action('woocommerce_after_add_to_cart_form', function () {
+  ?>
+  <div class="product-delivery-info">
+
+    <div class="delivery-item">
+      <span class="delivery-icon">
+        <!-- Truck -->
+        <svg class="delivery-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M3 7H15V17H3V7Z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M15 11H19L22 14V17H15V11Z" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="7" cy="17" r="2" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="17" cy="17" r="2" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </span>
+      <span>Besplatna dostava preko <strong>3500 RSD</strong></span>
+    </div>
+
+    <div class="delivery-item">
+      <span class="delivery-icon">
+        <!-- Clock -->
+        <svg class="delivery-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 7V12L15 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span>Rok za dostavu paketa <strong>2 radna dana</strong></span>
+    </div>
+
+  </div>
+  <?php
+});
+
+
+
+
+
+add_action(
+  'woocommerce_product_additional_information',
+  function ($product) {
+
+    if (!is_product()) {
+      return;
     }
-    return $availability;
+
+    $product_id = $product->get_id();
+
+    $text  = get_field('additional_tab_title_text', $product_id);
+    $image = get_field('additional_tab_image', $product_id);
+
+    // ako nema ništa — ne radimo ništa
+    if (!$text && !$image) {
+      return;
+    }
+    ?>
+    <div class="wc-additional-custom-content">
+
+      <?php if ($text): ?>
+        <div class="wc-additional-custom-text">
+          <?php echo wp_kses_post($text); ?>
+        </div>
+      <?php endif; ?>
+
+      <?php if ($image && isset($image['url'])): ?>
+        <div class="wc-additional-custom-image">
+          <img
+            src="<?php echo esc_url($image['url']); ?>"
+            alt="<?php echo esc_attr($image['alt'] ?? ''); ?>"
+            loading="lazy"
+          />
+        </div>
+      <?php endif; ?>
+
+    </div>
+    <?php
+  }
+);
+
+
+
+
+
+
+
+add_action(
+  'woocommerce_after_single_product_summary',
+  'custom_category_based_upsells',
+  2
+);
+
+function custom_category_based_upsells() {
+  if (!is_product()) {
+    return;
+  }
+
+  global $product;
+
+  if (!$product) {
+    return;
+  }
+
+  // ako proizvod NIJE u kategoriji 16 → ništa
+  if (!has_term(16, 'product_cat', $product->get_id())) {
+    return;
+  }
+
+  $args = [
+    'post_type'      => 'product',
+    'posts_per_page' => 4,
+    'orderby'        => 'rand',
+    'post_status'    => 'publish',
+    'post__not_in'   => [$product->get_id()],
+    'tax_query'      => [
+      [
+        'taxonomy' => 'product_cat',
+        'field'    => 'term_id',
+        'terms'    => [22],
+      ],
+    ],
+  ];
+
+  $upsell_query = new WP_Query($args);
+
+  if (!$upsell_query->have_posts()) {
+    return;
+  }
+
+  echo '<section class="custom-upsells upsell-products">';
+  echo '<h3 class="custom-upsells__title">Dodaj kreatin za maksimalne rezultate</h3>';
+  echo '<ul class="custom-upsells__grid products columns-4">';
+
+  while ($upsell_query->have_posts()) {
+    $upsell_query->the_post();
+    wc_get_template_part('content', 'product');
+  }
+
+  echo '</ul>';
+  echo '</section>';
+
+  wp_reset_postdata();
+}
+
+
+
+
+
+
+
+
+/*
+function sp_get_protein_promo_message() {
+  if (!is_product()) {
+    return '';
+  }
+
+  $product_id = get_queried_object_id();
+
+  if (!$product_id) {
+    return '';
+  }
+
+  // učitaj WC product objekat BEZ oslanjanja na global $product
+  $product = wc_get_product($product_id);
+
+  if (!$product) {
+    return '';
+  }
+
+  // radi samo za proizvode iz kategorije 17
+  if (!has_term(17, 'product_cat', $product_id)) {
+    return '';
+  }
+
+  if (!WC()->cart) {
+    return '';
+  }
+
+  $protein_count = 0;
+
+  foreach (WC()->cart->get_cart() as $cart_item) {
+    $cart_product_id = $cart_item['product_id'];
+
+    if (has_term(17, 'product_cat', $cart_product_id)) {
+      $protein_count += (int) $cart_item['quantity'];
+    }
+  }
+
+  // 1️⃣ prazna korpa ILI nema proteina
+  if (WC()->cart->is_empty() || $protein_count === 0) {
+   return '
+<svg class="promo-icon promo-icon--pulse" width="20" height="20" viewBox="0 0 24 24" fill="none">
+  <path d="M8 2h8v2h-1v2l2 3v11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9l2-3V4H8V2Z"
+        stroke="currentColor" stroke-width="1.5"/>
+</svg>
+Kupi <strong>2 proteina</strong> i <strong>treći dobijaš GRATIS</strong>!
+';
+
+  }
+
+  // 2️⃣ ima 1 protein
+  if ($protein_count === 1) {
+    return '
+<svg class="promo-icon promo-icon--bounce" width="20" height="20" viewBox="0 0 24 24" fill="none">
+  <path d="M12 5v14M5 12h14"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
+
+Dodaj još <strong>2 proteina</strong> i ostvari <strong>2+1 GRATIS</strong>!
+';
+
+  }
+
+  // 3️⃣ ima 2 proteina
+  if ($protein_count === 2) {
+    return '<svg class="promo-icon promo-icon--bounce" width="20" height="20" viewBox="0 0 24 24" fill="none">
+  <path d="M12 5v14M5 12h14"
+        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+</svg> Još <strong>1 protein</strong> te deli od <strong>BESPLATNOG trećeg</strong>!';
+  }
+
+  // 4️⃣ ima 3 ili više
+  if ($protein_count >= 3) {
+return '
+<svg class="promo-icon promo-icon--check" width="20" height="20" viewBox="0 0 24 24" fill="none">
+  <path d="M5 13l4 4L19 7"
+        stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+<strong>Bravo!</strong> Treći protein ti je <strong>BESPLATAN</strong>
+';
+
+
+  }
+
+  return '';
+}
+*/
+function sp_get_protein_promo_message() {
+
+  if (!WC()->cart) {
+    return '';
+  }
+
+  $protein_count = 0;
+
+  foreach (WC()->cart->get_cart() as $cart_item) {
+    $cart_product_id = $cart_item['product_id'];
+
+    if (has_term(17, 'product_cat', $cart_product_id)) {
+      $protein_count += (int) $cart_item['quantity'];
+    }
+  }
+
+  // ✅ SUCCESS STATE → vidi se SVUDA
+  if ($protein_count >= 3) {
+    return '
+    <svg class="promo-icon promo-icon--check" width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M5 13l4 4L19 7"
+            stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+     <strong>Čestitamo!</strong> Ostvario si <strong>2+1 GRATIS</strong> akciju!
+    ';
+  }
+
+  // ❗ sve ispod važi SAMO na product page
+  if (!is_product()) {
+    return '';
+  }
+
+  $product_id = get_queried_object_id();
+
+  if (!$product_id || !has_term(17, 'product_cat', $product_id)) {
+    return '';
+  }
+
+  // ostala logika (0 / 1 / 2 komada)
+  if (WC()->cart->is_empty() || $protein_count === 0) {
+    return '💥 Kupi <strong>2 proteina</strong> i <strong>treći dobijaš GRATIS</strong>!';
+  }
+
+  if ($protein_count === 1) {
+    return '➕ Dodaj još <strong>2 proteina</strong> i ostvari <strong>2+1 GRATIS</strong>!';
+  }
+
+  if ($protein_count === 2) {
+    return '🔥 Još <strong>1 protein</strong> te deli od <strong>BESPLATNOG trećeg</strong>!';
+  }
+
+  return '';
+}
+
+
+
+add_action('woocommerce_cart_calculate_fees', 'sp_apply_protein_2plus1_discount');
+
+function sp_apply_protein_2plus1_discount(WC_Cart $cart) {
+
+  if (is_admin() && !defined('DOING_AJAX')) {
+    return;
+  }
+
+  $protein_items = [];
+  $protein_qty   = 0;
+
+  foreach ($cart->get_cart() as $cart_item) {
+    $product_id = $cart_item['product_id'];
+
+    if (has_term(17, 'product_cat', $product_id)) {
+      $protein_qty += $cart_item['quantity'];
+
+      for ($i = 0; $i < $cart_item['quantity']; $i++) {
+        $protein_items[] = $cart_item['data']->get_price();
+      }
+    }
+  }
+
+  // nema uslova
+  if ($protein_qty < 3) {
+    return;
+  }
+
+  // treći (najjeftiniji) je gratis
+  sort($protein_items);
+  $free_price = (float) $protein_items[0];
+
+  if ($free_price <= 0) {
+    return;
+  }
+
+  $cart->add_fee(
+    __('Protein 2+1 GRATIS', 'superprotein'),
+    -$free_price,
+    false
+  );
 }

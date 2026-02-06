@@ -4,65 +4,6 @@
 		
 		$(document).ready(function(){
 
-			/*function handleAccordion() {
-				if ($(window).width() < 767) {
-					$('.mob-accordion').off('click').on('click', function () {
-						$(this).siblings().removeClass('accordion-opened');
-						$(this).parent().siblings().find('.mob-accordion').removeClass('accordion-opened');
-						$(this).parent().siblings().find('.accordion-content').slideUp();
-						$(this).siblings().find('.accordion-content').slideUp();
-						$(this).toggleClass('accordion-opened');
-						$(this).find('.accordion-content').slideToggle();
-					});
-				} else {
-					$('.mob-accordion').off('click');
-				}
-			}
-
-			// Run on page load
-			handleAccordion();*/
-
-			// Run on window resize
-			/*$(window).resize(function () {
-				handleAccordion();
-			});*/
-			
-
-			$('.scroll-down .box, .scroll-down img').click(function(e){
-
-			        // Find the next section
-			        var currentSection = $(this).parent().parent().parent();
-			        var nextSection = currentSection.next();
-
-			            $('html, body').animate({
-			                scrollTop: $('.next-section').offset().top
-			            }, 500); // Adjust the duration as needed
-			        
-			});
-
-
-			$('.contact-column textarea').attr('rows', '3');
-
-			$('textarea').on('change keyup paste input', function() {
-				$(this).css('height', 'auto'); // Reset the height
-				$(this).css('height', this.scrollHeight + 'px'); // Set the height to the scroll height
-				this.style.setProperty('height', this.scrollHeight + 'px', 'important');
-			});
-
-			/*------------------------------------*\
-   				 TABS
-			\*------------------------------------*/
-			$('.tabs p:first-child, .tab-content:nth-child(2)').addClass('active');
-
-			$('.tabs p').click(function() {
-				$(this).siblings().removeClass('active');
-				$(this).addClass('active');
-				 var index = $(this).index();
-     			 console.log(index);
-     			 $('.tab-content:nth-child('+ parseInt(index + 2) +')' ).addClass('active');
-     			 $('.tab-content:nth-child('+ parseInt(index + 2) +')' ).siblings().removeClass('active');
-			});
-
 
 
 			$('.wp-block-gallery a').attr('data-gall', 'gall1');
@@ -78,29 +19,8 @@
     spinner: 'rotating-plane'
 });
 */
-			
-			//search
-			$('.search-icon').click(function(e) {
-				$('.header-search').slideToggle('swing');
-			});
 
-			$('body .body-content').click(function(e) {
-				$('.header-search').slideUp('swing');
-			});
 
-			$('.search-again .btn').click(function(e) {
-				e.preventDefault();
-				$('.searchform').slideDown('swing');
-				$('body,html').animate({
-					scrollTop : 0                      
-				}, 500);
-			//	$('.searchform').slideDown('swing');
-			});
-
-			//close cart sidebar
-			$('.close-icon, .close-sidebar').click(function(e) {
-				$('.minicart-wrappper, body').removeClass('active');
-			});
 
 			/*------------------------------------*\
    				 MOBILE MENU
@@ -147,12 +67,12 @@
 			//create sticky nav
 			$(window).scroll(function() {
 
-				if ($(this).scrollTop() > 1){  
-					$('.header').addClass("sticky");
+				if ($(this).scrollTop() > 50){  
+					$('.header-bottom').addClass("sticky");
 					$('#theme-toggle').addClass('hide');
 				}
 				else{
-					$('.header').removeClass("sticky");
+					$('.header-bottom').removeClass("sticky");
 					$('#theme-toggle').removeClass('hide');
 				}
 			});
@@ -162,20 +82,26 @@
 			$('.accordion-title').click(function(){
 				$(this).toggleClass('opened');
 				$(this).next().slideToggle();
-				//$(this).parent().siblings().find('.accordion-content').slideUp();
-				//$(this).parent().siblings().find('.accordion-title').removeClass('opened');
+				$(this).parent().siblings().find('.accordion-content').slideUp();
+				$(this).parent().siblings().find('.accordion-title').removeClass('opened');
 			});
 
 
 			//animate click on achor
-			var $root = $('html, body');
-			$('a[href^="#"]').click(function () {
-			    $root.animate({
-			        scrollTop: $( $.attr(this, 'href') ).offset().top
-			    }, 500);
+var $root = $('html, body');
 
-			    return false;
-			});
+$('a[href^="#"]').not('.wc-tabs a, .woocommerce-tabs a').on('click', function (e) {
+    var target = $($.attr(this, 'href'));
+
+    if (!target.length) return;
+
+    e.preventDefault();
+
+    $root.animate({
+        scrollTop: target.offset().top
+    }, 500);
+});
+
 
 			$('.gutenberg .sticky a:first-child').addClass('clicked');
 
