@@ -5,6 +5,48 @@
 		$(document).ready(function(){
 
 
+			    const breakpoint = 1180;
+
+    // zapamti originalnog parenta i poziciju
+    const $socials = $('.socials');
+    const $originalParent = $socials.parent();
+    const originalIndex = $socials.index();
+
+    function moveSocials() {
+        const winWidth = $(window).width();
+
+        if (winWidth < breakpoint) {
+            // prebaci u mobile menu footer
+            if (!$socials.parent().is('.mobile-menu-footer')) {
+                $socials.detach().appendTo('.mobile-menu-footer');
+            }
+        } else {
+            // vrati nazad u header (na isto mesto)
+            if (!$socials.parent().is($originalParent)) {
+                if (originalIndex === 0) {
+                    $socials.detach().prependTo($originalParent);
+                } else {
+                    $socials.detach().insertAfter(
+                        $originalParent.children().eq(originalIndex - 1)
+                    );
+                }
+            }
+        }
+    }
+
+    // init
+    moveSocials();
+
+    // resize (debounce light)
+    let resizeTimer;
+    $(window).on('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(moveSocials, 100);
+    });
+
+
+	
+
 
 			$('.wp-block-gallery a').attr('data-gall', 'gall1');
 			$(".wp-block-gallery .wp-block-image").each(function(){
@@ -88,19 +130,19 @@
 
 
 			//animate click on achor
-var $root = $('html, body');
+				var $root = $('html, body');
 
-$('a[href^="#"]').not('.wc-tabs a, .woocommerce-tabs a').on('click', function (e) {
-    var target = $($.attr(this, 'href'));
+				$('a[href^="#"]').not('.wc-tabs a, .woocommerce-tabs a').on('click', function (e) {
+					var target = $($.attr(this, 'href'));
 
-    if (!target.length) return;
+					if (!target.length) return;
 
-    e.preventDefault();
+					e.preventDefault();
 
-    $root.animate({
-        scrollTop: target.offset().top
-    }, 500);
-});
+					$root.animate({
+						scrollTop: target.offset().top
+					}, 500);
+				});
 
 
 			$('.gutenberg .sticky a:first-child').addClass('clicked');
