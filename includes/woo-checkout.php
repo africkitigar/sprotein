@@ -1,7 +1,7 @@
 <?php
 
 
-
+/*
 function add_checkout_js_script() {
     if( is_checkout() ):
     ?>
@@ -75,7 +75,7 @@ function add_checkout_js_script() {
 }
 add_action('wp_footer', 'add_checkout_js_script');
 
-
+*/
 
 
 
@@ -145,6 +145,36 @@ function redirect_empty_cart_to_shop() {
         exit;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+add_filter('woocommerce_checkout_fields', function($fields) {
+
+    // Billing state
+    unset($fields['billing']['billing_state']);
+
+    // Shipping state
+    unset($fields['shipping']['shipping_state']);
+
+    return $fields;
+});
+
+
+
+
+
+
+
 
 
 

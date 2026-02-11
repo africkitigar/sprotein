@@ -147,30 +147,105 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 
-<?php if(is_product()): ?>
+<?php if(is_cart()): ?>
 <script>
-  jQuery(document).ready(function($) {
-    $(".quantity").each(function() {
-        var $input = $(this).find("input");
-        var $minus = $("<button type='button' class='minus'>-</button>");
-        var $plus = $("<button type='button' class='plus'>+</button>");
-        
-        $(this).prepend($minus).append($plus);
+  document.addEventListener('DOMContentLoaded', function () {
 
-        $plus.click(function() {
-            var val = parseInt($input.val());
-            if (!isNaN(val)) {
-                $input.val(val + 1).change();
-            }
-        });
+    const cartForm = document.querySelector('form.woocommerce-cart-form');
+    if (!cartForm) return;
 
-        $minus.click(function() {
-            var val = parseInt($input.val());
-            if (!isNaN(val) && val > 1) {
-                $input.val(val - 1).change();
-            }
-        });
+    function triggerCartUpdate() {
+        const updateBtn = cartForm.querySelector('[name="update_cart"]');
+        if (!updateBtn) return;
+
+        updateBtn.disabled = false;
+        updateBtn.click();
+    }
+
+    // Kada se promeni input
+    cartForm.addEventListener('change', function (e) {
+        if (e.target.classList.contains('qty')) {
+            triggerCartUpdate();
+        }
     });
+
+    // Kada se klikne plus/minus
+    cartForm.addEventListener('click', function (e) {
+        if (e.target.classList.contains('plus') || e.target.classList.contains('minus')) {
+            
+            const qtyInput = e.target.closest('.quantity').querySelector('.qty');
+            
+            setTimeout(() => {
+                qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 50);
+        }
+    });
+
+});
+
+</script>
+<?php endif; ?>
+
+
+<?php if(is_product() || is_cart()): ?>
+<script>
+jQuery(function($){
+
+    function initQuantityButtons() {
+
+        $('.quantity').each(function(){
+
+            if ($(this).find('.plus').length) return;
+
+            const $input = $(this).find('input.qty');
+
+            $(this).prepend("<button type='button' class='minus'>-</button>");
+            $(this).append("<button type='button' class='plus'>+</button>");
+        });
+    }
+
+    function triggerCartUpdate() {
+        const $form = $('form.woocommerce-cart-form');
+        const $updateBtn = $form.find('[name="update_cart"]');
+
+        if ($updateBtn.length) {
+            $updateBtn.prop('disabled', false).trigger('click');
+        }
+    }
+
+    // INIT NA LOAD
+    initQuantityButtons();
+
+    // INIT POSLE SVAKOG AJAX REFRESH-A
+    $(document.body).on('updated_cart_totals wc_fragments_refreshed', function(){
+        initQuantityButtons();
+    });
+
+    // EVENT DELEGATION ZA PLUS/MINUS
+    $(document).on('click', '.plus, .minus', function(){
+
+        const $qty = $(this).closest('.quantity').find('input.qty');
+
+        let current = parseInt($qty.val());
+        let step = parseInt($qty.attr('step')) || 1;
+        let min = parseInt($qty.attr('min')) || 0;
+
+        if ($(this).hasClass('plus')) {
+            $qty.val(current + step);
+        }
+
+        if ($(this).hasClass('minus') && current > min) {
+            $qty.val(current - step);
+        }
+
+        $qty.trigger('change');
+
+        setTimeout(function(){
+            triggerCartUpdate();
+        }, 200);
+
+    });
+
 });
 
 </script>

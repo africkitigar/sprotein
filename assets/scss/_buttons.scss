@@ -11,6 +11,11 @@
     transition: all .23s ease-in-out;
     background-color: $accent-color;
     padding: .8rem 2.4rem;
+    text-decoration: none;
+    border-radius: 1.6rem;
+    text-transform: uppercase;
+    cursor: pointer!important;
+    border: 1px solid transparent!important;
 
     &:hover {
         background-color: darken($accent-color, 5%);
