@@ -14,8 +14,10 @@ require_once(get_template_directory() . '/includes/gutenberg-extended.php');
 require_once(get_template_directory() . '/includes/cf7.php');
 
 require_once( get_template_directory() . '/includes/woo-products.php' );
-//require_once( get_template_directory() . '/includes/woo-account.php' );
+require_once( get_template_directory() . '/includes/woo-single-product.php' );
 require_once( get_template_directory() . '/includes/woo-checkout.php' );
+require_once( get_template_directory() . '/includes/woo-cart.php' );
+
 
 add_filter( 'woocommerce_enqueue_styles', '__return_false' );
 

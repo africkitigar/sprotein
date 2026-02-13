@@ -37,12 +37,30 @@
         justify-content: center;
         background-color: $lightgray-color;
         padding: 1.6rem;
-        font-size: 1.4rem;
+        font-size: 0;
         border-radius: 2.4rem;
 
         a {
             text-decoration: none;
             color: $secondary-color;
+            font-size: 1.4rem;
+
+            &:hover {
+                color: $cta-color;
+            }
+
+            &::after {
+                content: "→";
+                display: inline-block;
+                position: relative;
+                left: 1.6rem;
+                top: -1px;
+                color: $primary-color;
+            }
+        }
+
+        a:last-child::after {
+            display: none;
         }
     }
 
@@ -279,6 +297,10 @@
                     font-family: $alt-font;
                     font-weight: 600;
 
+                    .woocommerce-Price-currencySymbol {
+                        font-size: 1.5rem;
+                    }
+
                     bdi,
                     ins {
                         text-decoration: none!important;
@@ -287,6 +309,10 @@
                     del {
                         font-size: 2.4rem;
                         font-weight: 400;
+
+                        .woocommerce-Price-currencySymbol {
+                            display: none;
+                        }
                     }
                 }
 
@@ -409,6 +435,14 @@
 
 
 @media only screen and (max-width:781px) {
+    .woocommerce-breadcrumb {
+        margin-bottom: 1.2rem!important;
+        padding: .6rem!important;
+        a {
+            font-size: 1.2rem!important;
+        }
+        
+    }
     .woocommerce-product-gallery {
         flex-direction: column!important;
 

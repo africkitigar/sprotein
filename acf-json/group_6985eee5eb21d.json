@@ -3,6 +3,48 @@
     "title": "Custom product content",
     "fields": [
         {
+            "key": "field_698f1b619aa29",
+            "label": "Sastav",
+            "name": "sastav",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "allow_in_bindings": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 0,
+            "delay": 1
+        },
+        {
+            "key": "field_698f1b6f9aa2a",
+            "label": "Način pripreme",
+            "name": "nacin_pripreme",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "allow_in_bindings": 0,
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 0,
+            "delay": 1
+        },
+        {
             "key": "field_6985eee882301",
             "label": "additional_tab_title_text",
             "name": "additional_tab_title_text",
@@ -69,5 +111,5 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "modified": 1770385273
+    "modified": 1770986428
 }

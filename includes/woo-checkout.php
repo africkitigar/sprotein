@@ -1,81 +1,79 @@
 <?php
+/***
+ * Custom Post fee on checkout 
+ */
+add_action( 'woocommerce_cart_calculate_fees', 'add_cod_fee', 20, 1 );
+function add_cod_fee( $cart ) {
 
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) )
+        return;
 
-/*
-function add_checkout_js_script() {
-    if( is_checkout() ):
-    ?>
-    <script type="text/javascript">
-        jQuery(document).ready(function($) {
-            // Detach the table with class 'shop_table woocommerce-checkout-review-order-table'
-            var checkoutReviewOrderTable = $('.shop_table.woocommerce-checkout-review-order-table').detach();
+    if ( ! is_checkout() )
+        return;
 
-            // Select the coupon form (woo coupon form toggle)
-            var couponToggle = $('.woocommerce-form-coupon-toggle');
-            var couponForm = $('.checkout_coupon');
+    // Get chosen payment method
+    $chosen_payment_method = WC()->session->get( 'chosen_payment_method' );
 
-            // Create a new div with id 'checkoutsidebar'
-            var checkoutSidebar = $('<div id="checkoutsidebar"></div>');
+    if ( $chosen_payment_method === 'cod' ) {
 
-            // Append the coupon form to the new checkout sidebar
-            checkoutSidebar.prepend(couponToggle);
-            checkoutSidebar.prepend(couponForm);
+        $fee = 50; // amount
 
-
-            // Insert the checkout sidebar (which now includes the coupon form) before the review order table
-            checkoutSidebar.append(checkoutReviewOrderTable);
-
-            // Insert the new checkoutsidebar after the div with data-shortcode="checkout"
-            $('div[data-shortcode="checkout"]').after(checkoutSidebar);
-
-            jQuery(function($) {
-    // Update cart when quantity changes
-    $(document).on('change', '.woocommerce-cart-form input.qty', function() {
-        $('button[name="update_cart"]').trigger('click');
-    });
-
-    // Reinitialize quantity buttons after cart update
-    $(document.body).on('updated_wc_div', function() {
-        addPlusMinusButtons(); // Re-add buttons after cart updates
-    });
-
-    // Function to add plus/minus buttons
-    function addPlusMinusButtons() {
-        $('.woocommerce-cart-form .quantity').each(function() {
-            if (!$(this).find('.qty-button').length) {
-                $(this).prepend('<button type="button" class="qty-button minus">−</button>');
-                $(this).append('<button type="button" class="qty-button plus">+</button>');
-            }
-        });
+        $cart->add_fee(
+            __( 'Naknada pošte za pouzeće', 'woocommerce' ),
+            $fee,
+            false // not taxable
+        );
     }
+}
 
-    // Handle plus/minus button clicks
-    $(document).on('click', '.qty-button.plus', function() {
-        var $input = $(this).siblings('input.qty');
-        $input.val(parseInt($input.val()) + 1).trigger('change');
+add_action( 'wp_footer', function() {
+    if ( ! is_checkout() ) return;
+    ?>
+    <script>
+    jQuery(function($){
+        $('form.checkout').on('change', 'input[name="payment_method"]', function(){
+            $('body').trigger('update_checkout');
+        });
     });
-
-    $(document).on('click', '.qty-button.minus', function() {
-        var $input = $(this).siblings('input.qty');
-        if ($input.val() > 1) {
-            $input.val(parseInt($input.val()) - 1).trigger('change');
-        }
-    });
-
-    // Initialize buttons on page load
-    addPlusMinusButtons();
-});
-
-
-
-            });//ready
     </script>
     <?php
-    endif; //checkout
-}
-add_action('wp_footer', 'add_checkout_js_script');
+});
+/** end of | Custom Post fee on checkout  **/
 
-*/
+
+
+
+/**
+ * Hide other shipping methods when free shipping is available
+ */
+add_filter( 'woocommerce_package_rates', 'hide_other_shipping_when_free_available', 100 );
+
+function hide_other_shipping_when_free_available( $rates ) {
+
+    $free = [];
+
+    foreach ( $rates as $rate_id => $rate ) {
+
+        if ( $rate->method_id === 'free_shipping' ) {
+            $free[ $rate_id ] = $rate;
+        }
+    }
+
+    // Ako postoji free shipping → vrati samo njega
+    if ( ! empty( $free ) ) {
+        return $free;
+    }
+
+    return $rates;
+}
+
+/** end of | Hide other shipping methods when free shipping is available  **/
+
+
+
+
+
+
 
 
 
@@ -123,7 +121,7 @@ add_action('wp_ajax_nopriv_update_cart_quantity', 'update_cart_quantity_ajax');
 
 
 
-
+/*
 add_action('wp_loaded', 'redirect_to_shop_when_cart_empty');
 function redirect_to_shop_when_cart_empty() {
     // Only proceed if we're on the checkout page and it's an AJAX call for removing an item
@@ -147,7 +145,7 @@ function redirect_empty_cart_to_shop() {
 }
 
 
-
+*/
 
 
 

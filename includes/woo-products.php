@@ -17,17 +17,6 @@ function remove_woocommerce_page_title()
 add_filter('woocommerce_show_page_title', 'remove_woocommerce_page_title');
 
 
-function custom_woocommerce_result_count()
-{
-    global $wp_query;
-
-    if ($wp_query->found_posts > 0) {
-        echo '<p class="custom-result-count">' . sprintf(
-            _n('Zeige %d Produkt', 'Zeige %d Produkte', $wp_query->found_posts, 'woocommerce'),
-            $wp_query->found_posts
-        ) . '</p>';
-    }
-}
 
 
 
@@ -151,63 +140,16 @@ function custom_woocommerce_pagination_svg_arrows($args)
 
 
 
-// Move short description after the title on single product page
-remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
-add_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 6);
-
-//remove category in summary
-remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
 
 
 
 
 
-// Remove WooCommerce product tabs from default position
-remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10);
-
-add_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 1);
-
-// Add the tabs after product summary with accordion structure
-/*add_action('woocommerce_after_single_product_summary', 'custom_woocommerce_output_product_tabs', 1);
-
-function custom_woocommerce_output_product_tabs()
-{
-    global $product;
-
-    // Get the product tabs
-    $tabs = apply_filters('woocommerce_product_tabs', array());
-
-    // Get all product attributes
-    $attributes = $product->get_attributes();
-
-    if (!empty($tabs)  || !empty( $attributes )) {
-        echo '<div class="woocommerce-accordion-tabs">';
 
 
-        foreach ($tabs as $key => $tab) {
-            // Output the tab title with the "accordion-title" class
-            echo '<div class="accordion"><div class="accordion-title" data-tab-key="' . esc_attr($key) . '">';
-            echo esc_html($tab['title']);
-            echo '</div>';
-
-            // Output the tab content with the "accordion-content" class
-            echo '<div class="accordion-content" id="content-' . esc_attr($key) . '">';
-            if (isset($tab['callback']) && is_callable($tab['callback'])) {
-                // Capture and display the content from the callback
-                call_user_func($tab['callback'], $key, $tab);
-            }
-            echo '</div></div>';
-        }//endoforeach 
-
-        ?>
 
 
-        <?php
 
-        echo '</div>'; // End of woocommerce-accordion-tabs
-    }
-}
-*/
 
 remove_action(
   'woocommerce_after_single_product_summary',
@@ -308,16 +250,6 @@ function custom_woocommerce_variable_sale_percentage($html, $post, $product)
 
 
 
-add_filter('woocommerce_output_related_products_args', 'custom_related_products_args');
-
-function custom_related_products_args($args)
-{
-    // Set the number of related products to 3
-    $args['posts_per_page'] = 4; // Number of related products
-    $args['columns'] = 4; // Number of columns (optional, adjust as needed)
-
-    return $args;
-}
 
 
 
@@ -327,38 +259,6 @@ function custom_related_products_args($args)
 
 
 
-add_action('woocommerce_single_product_summary', 'custom_sku_below_title', 5);
-function custom_sku_below_title()
-{
-    global $product;
-    if ($product->get_sku() && !$product->is_type('variable')) {
-        echo '<p class="custom-sku"><b>Artikelcode:</b> ' . $product->get_sku() . '</p>';
-    }
-
-    if ($product->is_type('variable')) {
-        echo '<div class="woocommerce-variation-sku custom-sku">';
-        echo '<span class="label"><strong>' . esc_html__('Artikelcode:', 'woocommerce') . '</strong></span> ';
-        echo '<span class="value">' . esc_html($product->get_sku()) . '</span>';
-        echo '</div>';
-        
-        wc_enqueue_js("
-            jQuery(function($) {
-                $('form.variations_form').on('show_variation', function(event, variation) {
-                    $('.woocommerce-variation-sku .value').text(variation.sku);
-                }).on('hide_variation', function() {
-                    $('.woocommerce-variation-sku .value').text('" . esc_js($product->get_sku()) . "');
-                });
-            });
-        ");
-    }
-}
-
-
-// Remove default price location
-remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
-
-// Add price below title (priority 5)
-add_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 5);
 
 
 
@@ -366,19 +266,6 @@ add_action('woocommerce_single_product_summary', 'woocommerce_template_single_pr
 
 
 
-
-
-add_filter('woocommerce_get_breadcrumb', function ($crumbs) {
-    if (!empty($crumbs)) {
-        // Get the last breadcrumb
-        $last_index = count($crumbs) - 1;
-
-        // Add a class to the last breadcrumb
-        $crumbs[$last_index][0] = ' &nbsp; &nbsp; ' . esc_html($crumbs[$last_index][0]);
-    }
-
-    return $crumbs;
-}, 10, 1);
 
 
 
@@ -534,13 +421,6 @@ add_shortcode('featured_products_slider', 'custom_featured_products_slider');
 
 
 
-function enable_gutenberg_for_products($can_edit, $post_type) {
-    if ($post_type === 'product') {
-        $can_edit = true;
-    }
-    return $can_edit;
-}
-add_filter('use_block_editor_for_post_type', 'enable_gutenberg_for_products', 10, 2);
 
 
 
@@ -689,108 +569,6 @@ add_action('wp_footer', 'add_woocommerce_category_accordion');
 
 
 
-/**
- * Show variable price with min value
- */
-add_filter('woocommerce_variable_price_html', 'custom_variable_price_if_price_range', 10, 2);
-
-function custom_variable_price_if_price_range($price, $product) {
-    if ($product->is_type('variable')) {
-        $variation_prices = $product->get_variation_prices(true); // true = including tax
-
-        $prices = $variation_prices['price']; // array of variation prices
-        $unique_prices = array_unique($prices);
-
-        if (count($unique_prices) > 1) {
-            $min_price = min($unique_prices);
-            $formatted_price = wc_price($min_price);
-            return 'ab ' . $formatted_price;
-        }
-    }
-
-    return $price; // fallback to default price output
-}
-
-
-
-
-
-add_action('woocommerce_after_add_to_cart_form', function () {
-  ?>
-  <div class="product-delivery-info">
-
-    <div class="delivery-item">
-      <span class="delivery-icon">
-        <!-- Truck -->
-        <svg class="delivery-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M3 7H15V17H3V7Z" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M15 11H19L22 14V17H15V11Z" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="7" cy="17" r="2" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="17" cy="17" r="2" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
-      </span>
-      <span>Besplatna dostava preko <strong>3500 RSD</strong></span>
-    </div>
-
-    <div class="delivery-item">
-      <span class="delivery-icon">
-        <!-- Clock -->
-        <svg class="delivery-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M12 7V12L15 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </span>
-      <span>Rok za dostavu paketa <strong>2 radna dana</strong></span>
-    </div>
-
-  </div>
-  <?php
-});
-
-
-
-
-
-add_action(
-  'woocommerce_product_additional_information',
-  function ($product) {
-
-    if (!is_product()) {
-      return;
-    }
-
-    $product_id = $product->get_id();
-
-    $text  = get_field('additional_tab_title_text', $product_id);
-    $image = get_field('additional_tab_image', $product_id);
-
-    // ako nema ništa — ne radimo ništa
-    if (!$text && !$image) {
-      return;
-    }
-    ?>
-    <div class="wc-additional-custom-content">
-
-      <?php if ($text): ?>
-        <div class="wc-additional-custom-text">
-          <?php echo wp_kses_post($text); ?>
-        </div>
-      <?php endif; ?>
-
-      <?php if ($image && isset($image['url'])): ?>
-        <div class="wc-additional-custom-image">
-          <img
-            src="<?php echo esc_url($image['url']); ?>"
-            alt="<?php echo esc_attr($image['alt'] ?? ''); ?>"
-            loading="lazy"
-          />
-        </div>
-      <?php endif; ?>
-
-    </div>
-    <?php
-  }
-);
 
 
 
@@ -798,63 +576,10 @@ add_action(
 
 
 
-add_action(
-  'woocommerce_after_single_product_summary',
-  'custom_category_based_upsells',
-  2
-);
 
-function custom_category_based_upsells() {
-  if (!is_product()) {
-    return;
-  }
 
-  global $product;
 
-  if (!$product) {
-    return;
-  }
 
-  // ako proizvod NIJE u kategoriji 16 → ništa
-  if (!has_term(16, 'product_cat', $product->get_id())) {
-    return;
-  }
-
-  $args = [
-    'post_type'      => 'product',
-    'posts_per_page' => 4,
-    'orderby'        => 'rand',
-    'post_status'    => 'publish',
-    'post__not_in'   => [$product->get_id()],
-    'tax_query'      => [
-      [
-        'taxonomy' => 'product_cat',
-        'field'    => 'term_id',
-        'terms'    => [22],
-      ],
-    ],
-  ];
-
-  $upsell_query = new WP_Query($args);
-
-  if (!$upsell_query->have_posts()) {
-    return;
-  }
-
-  echo '<section class="custom-upsells upsell-products">';
-  echo '<h3 class="custom-upsells__title">Dodaj kreatin za maksimalne rezultate</h3>';
-  echo '<ul class="custom-upsells__grid products columns-4">';
-
-  while ($upsell_query->have_posts()) {
-    $upsell_query->the_post();
-    wc_get_template_part('content', 'product');
-  }
-
-  echo '</ul>';
-  echo '</section>';
-
-  wp_reset_postdata();
-}
 
 
 
