@@ -184,6 +184,8 @@
 
             table {
                 font-size: 1.5rem;
+                width:100%;
+                
                 th {
                     font-weight: 400;
                     text-align: left;
@@ -222,6 +224,12 @@
     }
 }
 
+
+
+
+.custom-cart-crossells {
+    grid-column: 1 / -1;
+}
 
 
 @media only screen and (max-width:1023px) {

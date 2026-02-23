@@ -170,9 +170,90 @@ add_filter('woocommerce_checkout_fields', function($fields) {
 
 
 
+/*
+add_action('woocommerce_cart_calculate_fees', function($cart) {
+
+    if (is_admin() && !defined('DOING_AJAX')) {
+        return;
+    }
+
+    if (!is_checkout()) return;
+
+    // Uzimamo billing country sa checkouta
+    $billing_country = WC()->customer->get_billing_country();
+
+    // Ako nije Srbija (RS)
+    if ($billing_country && $billing_country !== 'RS') {
+
+        $cart->add_fee(
+            'Troškovi isporuke u inostranstvo',
+            800,
+            false // false = nije oporezivo
+        );
+    }
+
+});
+*/
+
+
+/**
+ * Remove COD if selected country is not Serbia on checkout
+ */
+add_filter('woocommerce_available_payment_gateways', function($gateways) {
+
+    if (is_admin()) {
+        return $gateways;
+    }
+
+    $country = WC()->customer->get_billing_country();
+
+    // Ako NIJE Srbija → ukloni COD
+    if ($country && $country !== 'RS') {
+        unset($gateways['cod']);
+    }
+
+    return $gateways;
+
+});
+/**
+ * Remove default shipping methods when country is not Serbia
+ */
+/*add_filter('woocommerce_package_rates', function($rates, $package) {
+
+    $country = WC()->customer->get_shipping_country();
+
+    if ($country && $country !== 'RS') {
+        return []; // uklanja sve shipping metode
+    }
+
+    return $rates;
+
+}, 20, 2);*/
 
 
 
+add_action('woocommerce_review_order_after_order_total', function() {
 
+    $country = WC()->customer->get_shipping_country();
 
+    if (!$country || $country === 'RS') {
+        return;
+    }
 
+    $exchange_rate = 117.4;
+
+    // Ukupan iznos sa svim fee-ovima
+    $total_rsd = WC()->cart->get_total('edit'); 
+    $total_rsd = floatval($total_rsd);
+
+    if (!$total_rsd) return;
+
+    $total_eur = $total_rsd / $exchange_rate;
+    $total_eur = number_format($total_eur, 2, ',', '.');
+
+    echo '<tr class="international-eur-total">
+            <th>Ukupno u evrima</th>
+            <td><strong>≈ ' . $total_eur . ' €</strong><br></td>
+          </tr>';
+
+});

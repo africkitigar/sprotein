@@ -209,6 +209,7 @@ function custom_variable_price_if_price_range($price, $product) {
 /**
  * Custom upsell products on single product
  */
+
 add_action(
   'woocommerce_after_single_product_summary',
   'custom_category_based_upsells',
@@ -226,8 +227,10 @@ function custom_category_based_upsells() {
     return;
   }
 
-  // ako proizvod NIJE u kategoriji 16 → ništa
-  if (!has_term(16, 'product_cat', $product->get_id())) {
+  $product_id = $product->get_id();
+
+  // Ako proizvod NIJE u kategoriji 16 ili 17 → ništa
+  if (!has_term([16, 17], 'product_cat', $product_id)) {
     return;
   }
 
@@ -236,12 +239,24 @@ function custom_category_based_upsells() {
     'posts_per_page' => 4,
     'orderby'        => 'rand',
     'post_status'    => 'publish',
-    'post__not_in'   => [$product->get_id()],
+    'post__not_in'   => [$product_id],
     'tax_query'      => [
+      'relation' => 'AND',
+
+      // Mora biti u kategoriji 22 ili 24
       [
         'taxonomy' => 'product_cat',
         'field'    => 'term_id',
-        'terms'    => [22],
+        'terms'    => [22, 24],
+        'operator' => 'IN',
+      ],
+
+      // Ne sme imati tag 29
+      [
+        'taxonomy' => 'product_tag',
+        'field'    => 'term_id',
+        'terms'    => [29],
+        'operator' => 'NOT IN',
       ],
     ],
   ];

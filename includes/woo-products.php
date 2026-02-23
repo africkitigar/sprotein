@@ -20,6 +20,12 @@ add_filter('woocommerce_show_page_title', 'remove_woocommerce_page_title');
 
 
 
+// Set products per page to 4
+add_filter('loop_shop_per_page', function($cols) {
+    return 4;
+}, 20);
+
+
 /**
  * Move Woo "On sale" badge from gallery to summary and show % discount.
  */
@@ -783,6 +789,97 @@ function sp_apply_protein_2plus1_discount(WC_Cart $cart) {
 
 
 
+add_filter( 'template_include', 'load_custom_single_for_tag_29', 99 );
+
+function load_custom_single_for_tag_29( $template ) {
+
+    if ( is_product() ) {
+
+        $product_id = get_queried_object_id();
+
+        if ( has_term( 29, 'product_tag', $product_id ) ) {
+
+            $custom = locate_template( 'woocommerce/single-product-special.php' );
+
+            if ( $custom ) {
+                return $custom;
+            }
+        }
+    }
+
+    return $template;
+}
+
+
+
+add_filter( 'wc_get_template_part', 'load_custom_loop_template_for_tag_29', 10, 3 );
+
+function load_custom_loop_template_for_tag_29( $template, $slug, $name ) {
+
+    if ( $slug === 'content' && $name === 'product' ) {
+
+        global $product;
+
+        if ( $product && has_term( 29, 'product_tag', $product->get_id() ) ) {
+
+            $custom = locate_template( 'woocommerce/content-product-special.php' );
+
+            if ( $custom ) {
+                return $custom;
+            }
+        }
+    }
+
+    return $template;
+}
+
+
+add_filter( 'woocommerce_related_products', 'exclude_tag_29_from_related', 10, 3 );
+
+function exclude_tag_29_from_related( $related_posts, $product_id, $args ) {
+
+    foreach ( $related_posts as $key => $related_id ) {
+
+        if ( has_term( 29, 'product_tag', $related_id ) ) {
+            unset( $related_posts[$key] );
+        }
+    }
+
+    return $related_posts;
+}
+
+
+add_filter( 'woocommerce_upsell_display_args', function( $args ) {
+    return $args;
+});
+
+add_filter( 'woocommerce_upsell_ids', 'exclude_tag_29_from_upsells', 10, 2 );
+
+function exclude_tag_29_from_upsells( $upsells, $product_id ) {
+
+    foreach ( $upsells as $key => $upsell_id ) {
+
+        if ( has_term( 29, 'product_tag', $upsell_id ) ) {
+            unset( $upsells[$key] );
+        }
+    }
+
+    return $upsells;
+}
+
+add_filter( 'woocommerce_cross_sells', 'exclude_tag_29_from_cross_sells' );
+
+function exclude_tag_29_from_cross_sells( $cross_sells ) {
+
+    foreach ( $cross_sells as $key => $id ) {
+
+        if ( has_term( 29, 'product_tag', $id ) ) {
+            unset( $cross_sells[$key] );
+        }
+    }
+
+    return $cross_sells;
+}
 
 
 /**
@@ -852,6 +949,10 @@ function akcija_21_forma() {
 
     <?php
 }
+
+
+
+
 
 
 
@@ -962,4 +1063,106 @@ jQuery(function($){
 </script>
 
 <?php
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+add_action('wp_ajax_add_bundle_to_cart', 'add_bundle_to_cart');
+add_action('wp_ajax_nopriv_add_bundle_to_cart', 'add_bundle_to_cart');
+
+function add_bundle_to_cart() {
+
+    $ids = $_POST['products'];
+
+    foreach ($ids as $key => $id) {
+
+        if ($key == 2) {
+            WC()->cart->add_to_cart($id, 1, 0, [], ['is_free_flavor' => true]);
+        } else {
+            WC()->cart->add_to_cart($id, 1);
+        }
+    }
+
+    WC_AJAX::get_refreshed_fragments(); 
+}
+
+add_action('wp_footer', function() {
+if (!is_product()) return;
+?>
+
+<script>
+jQuery(function($){
+
+    $('.special-bundle-form').on('submit', function(e){
+        e.preventDefault();
+
+        const products = [
+            $('select[name="flavor_1"]').val(),
+            $('select[name="flavor_2"]').val(),
+            $('select[name="flavor_3"]').val(),
+        ];
+
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo admin_url('admin-ajax.php'); ?>',
+            data: {
+                action: 'add_bundle_to_cart',
+                products: products
+            },
+            success: function(response){
+
+                if(response.fragments){
+
+                    $.each(response.fragments, function(key, value){
+                        $(key).replaceWith(value);
+                    });
+
+                }
+
+                $('.bundle-success').fadeIn();
+            }
+        });
+
+    });
+
+});
+</script>
+
+<?php
+});
+
+
+
+add_action( 'woocommerce_before_calculate_totals', function( $cart ) {
+
+    foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+
+        if ( isset( $cart_item['is_free_flavor'] ) ) {
+            $cart_item['data']->set_price( 0 );
+        }
+    }
+
 });

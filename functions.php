@@ -8,7 +8,6 @@
 /*------------------------------------*\
     External Modules/Files
 \*------------------------------------*/
-require_once(get_template_directory() . '/includes/cpt.php');
 require_once(get_template_directory() . '/includes/optimize.php');
 require_once(get_template_directory() . '/includes/gutenberg-extended.php');
 require_once(get_template_directory() . '/includes/cf7.php');
