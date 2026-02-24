@@ -11,6 +11,7 @@
 require_once(get_template_directory() . '/includes/optimize.php');
 require_once(get_template_directory() . '/includes/gutenberg-extended.php');
 require_once(get_template_directory() . '/includes/cf7.php');
+require_once(get_template_directory() . '/includes/blog.php');
 
 require_once( get_template_directory() . '/includes/woo-products.php' );
 require_once( get_template_directory() . '/includes/woo-single-product.php' );
@@ -106,8 +107,7 @@ if (function_exists('add_theme_support')) {
     // Add Thumbnail Theme Support
     add_theme_support('post-thumbnails');
     add_image_size('grid-item', 400, 290, true);
-    //add_image_size('rectangle', 860, 430, true);
-    //  add_image_size('hero', 1920, 700, true);
+    add_image_size('hero', 1920, 700, true);
     // add_image_size('square', 430, 430, true);
 
     // Enables post and comment RSS feed links to head

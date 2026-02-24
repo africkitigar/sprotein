@@ -20,9 +20,9 @@ add_filter('woocommerce_show_page_title', 'remove_woocommerce_page_title');
 
 
 
-// Set products per page to 4
+// Set products per page to 24
 add_filter('loop_shop_per_page', function($cols) {
-    return 4;
+    return 24;
 }, 20);
 
 

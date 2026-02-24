@@ -21,7 +21,7 @@
 				<div class="post-excerpt">
 					<?php echo get_the_excerpt(); ?>
 				</div>
-				<a class="read-article" href="<?php echo get_the_permalink(); ?>">Learn more</a>
+				<a class="read-article btn" href="<?php echo get_the_permalink(); ?>">Pročitaj post</a>
 			</div>
 
 

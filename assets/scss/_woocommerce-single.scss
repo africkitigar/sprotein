@@ -483,6 +483,18 @@
     }
 
     .single-product {
+        .product-delivery-info .delivery-item {
+            font-size: 1.2rem!important;
+        }
+        ul.tabs {
+            li {
+                a {
+                    font-size: 1.4rem!important;
+                    white-space: nowrap;
+                    padding: 1rem 1.2rem!important;
+                }
+            }
+        }
         .related.products {
             padding: 2.4rem .8rem!important;
            

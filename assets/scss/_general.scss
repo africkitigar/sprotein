@@ -71,6 +71,11 @@ body::-webkit-scrollbar-thumb,
     max-width: $container;
 }
 
+.container-narrow {
+    margin: 0 auto;
+    max-width: calc($container * 0.6);
+}
+
 img {
     max-width: 100%;
     vertical-align: bottom;

@@ -46,15 +46,9 @@ $query = new WP_Query($args);
 if ($query->have_posts()) {
   ?>
   <div class="latest-posts-block">
-    <svg class="shape-left" xmlns="http://www.w3.org/2000/svg" width="492" height="892" viewBox="0 0 492 892" fill="none">
-      <path
-        d="M7.62939e-05 0L483.878 0.000107353C489.618 0.000108627 493.491 5.86771 491.233 11.146L116.576 887.146C115.317 890.09 112.423 892 109.22 892L-1.68717e-06 892L7.62939e-05 0Z"
-        fill="#92D8E8" />
-    </svg>
 
-    <div class="slider-header">
-      <h2>Related articles</h2>
-
+    <div class="slider-header container">
+      <h2>Ostali artikli</h2>
     </div>
 
     <div class="swiper postsSwiper">
@@ -67,14 +61,14 @@ if ($query->have_posts()) {
             <article class="post-in-loop">
               <?php if (has_post_thumbnail()): ?>
                 <a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>" class="post-in-loop-image">
-                  <?php the_post_thumbnail('grid-item'); ?>
+                  <?php the_post_thumbnail('large'); ?>
                 </a>
               <?php endif; ?>
               <div class="post-in-loop-content">
                 <h2>
                   <a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>"><?php the_title(); ?></a>
                 </h2>
-                <a class="read-article" href="<?php echo get_the_permalink(); ?>">Learn more</a>
+                <a class="read-article btn" href="<?php echo get_the_permalink(); ?>">Pročitaj post</a>
               </div>
             </article>
           </div>
@@ -99,10 +93,6 @@ if ($query->have_posts()) {
               fill="#101223" />
           </svg>
         </div>
-
-        <a class="btn btn-outline" href="<?php echo $parent_category_url; ?>">
-          View all
-        </a>
       </div> <!--/related-posts -->
     </div>
   </div>
@@ -116,7 +106,7 @@ wp_reset_postdata();
 <script>
 // Function to calculate the offset dynamically
 const calculateOffset = () => {
-  const slideWidth = 1460; // Desired slide width in pixels
+  const slideWidth = 1520; // Desired slide width in pixels
   const viewportWidth = window.innerWidth; // Viewport width
 
   // Calculate the offset: (100vw - slideWidth) / 2
