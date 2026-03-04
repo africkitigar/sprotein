@@ -12,6 +12,7 @@ require_once(get_template_directory() . '/includes/optimize.php');
 require_once(get_template_directory() . '/includes/gutenberg-extended.php');
 require_once(get_template_directory() . '/includes/cf7.php');
 require_once(get_template_directory() . '/includes/blog.php');
+require_once(get_template_directory() . '/includes/block-shortcodes.php');
 
 require_once( get_template_directory() . '/includes/woo-products.php' );
 require_once( get_template_directory() . '/includes/woo-single-product.php' );
@@ -191,30 +192,18 @@ function theme_scripts()
         wp_register_style('main-theme-css', get_template_directory_uri() . '/style.min.css', array(), '1.1', 'all');
         wp_enqueue_style('main-theme-css'); // Enqueue it!
 
-        if (has_block('acf/gallery-block') || has_block('acf/posts-slider') || has_block('acf/testimonials') || is_single() ) {
+        
             wp_register_script('swiper', get_template_directory_uri() . '/assets/js/swiper.min.js', '', '1.0.0');
             wp_enqueue_script('swiper');
 
             wp_register_style('swiper-css', get_template_directory_uri() . '/assets/css/swiper.min.css', array(), '1.0', 'all');
             wp_enqueue_style('swiper-css'); // Enqueue it!
 
-
-
-        }
-
+/*
         if( is_front_page() || is_page() && wp_get_post_parent_id(get_the_ID()) ){
             wp_enqueue_script('custom-swiper', get_template_directory_uri() . '/assets/js/custom-swiper.js', ['swiper'], '1.0', true);
         }
-
-
-        if (has_block('acf/videos') ) {
-            wp_register_script('venobox', get_template_directory_uri() . '/assets/js/venobox.min.js', '', '1.0.0');
-            wp_enqueue_script('venobox');
-
-            wp_register_style('venobox-css', get_template_directory_uri() . '/assets/css/venobox.min.css', array(), '1.0', 'all');
-            wp_enqueue_style('venobox-css'); // Enqueue it!
-        }
-
+*/
 
         // Enqueue Lenis script from CDN with defer attribute.
         wp_enqueue_script(

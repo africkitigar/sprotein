@@ -31,12 +31,4 @@
 
 	<?php endwhile; ?>
 
-<?php else: ?>
-
-	<!-- article -->
-	<article>
-
-	</article>
-	<!-- /article -->
-
 <?php endif; ?>

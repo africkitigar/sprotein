@@ -45,9 +45,9 @@
             "delay": 1
         },
         {
-            "key": "field_6985eee882301",
-            "label": "additional_tab_title_text",
-            "name": "additional_tab_title_text",
+            "key": "field_69a860abaaa7f",
+            "label": "Deklaracija",
+            "name": "deklaracija",
             "aria-label": "",
             "type": "wysiwyg",
             "instructions": "",
@@ -62,34 +62,8 @@
             "allow_in_bindings": 0,
             "tabs": "all",
             "toolbar": "full",
-            "media_upload": 0,
-            "delay": 1
-        },
-        {
-            "key": "field_6985ef1782302",
-            "label": "additional_tab_image",
-            "name": "additional_tab_image",
-            "aria-label": "",
-            "type": "image",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "array",
-            "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": "",
-            "allow_in_bindings": 0,
-            "preview_size": "medium"
+            "media_upload": 1,
+            "delay": 0
         }
     ],
     "location": [
@@ -111,5 +85,5 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "modified": 1770986428
+    "modified": 1772642488
 }

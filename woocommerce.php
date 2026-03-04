@@ -62,6 +62,25 @@ if ( is_product_category() ) {
                 // Place the result count where you want
                 woocommerce_result_count(); ?>
 
+                <div class="mobile-grid-toggle">
+                    <button class="grid-btn active" data-grid="1">
+                        
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="3" width="18" height="7"></rect>
+                            <rect x="3" y="14" width="18" height="7"></rect>
+                        </svg>
+                    </button>
+
+                    <button class="grid-btn" data-grid="2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </button>
+                </div>
+
             </div>
         </div>
         <div class="shop-container">
@@ -83,3 +102,46 @@ if ( is_product_category() ) {
 
 </div>
 <?php get_footer(); ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+    const buttons = document.querySelectorAll('.grid-btn');
+    const products = document.querySelector('.listed-products');
+
+    if(!products) return;
+
+    // 🔹 1. učitaj prethodni izbor
+    const saved = localStorage.getItem('productGrid');
+
+    if(saved === "2"){
+        products.classList.add('grid-2');
+        document.querySelector('[data-grid="2"]')?.classList.add('active');
+        document.querySelector('[data-grid="1"]')?.classList.remove('active');
+    }
+
+    // 🔹 2. klik na dugme
+    buttons.forEach(btn => {
+
+        btn.addEventListener('click', function(){
+
+            buttons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const grid = this.dataset.grid;
+
+            if(grid === "2"){
+                products.classList.add('grid-2');
+            }else{
+                products.classList.remove('grid-2');
+            }
+
+            // 🔹 sačuvaj izbor
+            localStorage.setItem('productGrid', grid);
+
+        });
+
+    });
+
+});   
+</script>

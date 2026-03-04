@@ -83,3 +83,41 @@ remove_action('wp_head', 'wp_generator');
 
 //Remove xmlrpc
 add_filter('xmlrpc_enabled', '__return_false');
+
+
+
+
+
+/**
+ * Disable comments & WooCommerce reviews completely
+ */
+
+// 1. Disable comments everywhere
+add_action('init', function () {
+
+    // Remove comment support from all post types
+    foreach (get_post_types() as $post_type) {
+        if (post_type_supports($post_type, 'comments')) {
+            remove_post_type_support($post_type, 'comments');
+            remove_post_type_support($post_type, 'trackbacks');
+        }
+    }
+});
+
+// Close comments & pings on frontend
+add_filter('comments_open', '__return_false', 20, 2);
+add_filter('pings_open', '__return_false', 20, 2);
+add_filter('comments_array', '__return_empty_array', 10, 2);
+
+// 2. Remove WooCommerce product reviews
+add_filter('woocommerce_enable_reviews', '__return_false');
+add_filter('woocommerce_product_tabs', function ($tabs) {
+    unset($tabs['reviews']);
+    return $tabs;
+}, 98);
+
+// 3. Disable REST comments endpoint
+add_filter('rest_endpoints', function ($endpoints) {
+    unset($endpoints['/wp/v2/comments']);
+    return $endpoints;
+});

@@ -47,84 +47,90 @@
   </svg>
 </div><!-- back to top -->
 
+<?php if(is_front_page()): ?>
+<script>
+jQuery(function ($) {
+
+    $('.top-picks-cat').on('click', function () {
+
+        const btn = $(this);
+        const cat = btn.data('cat');
+        const wrapper = btn.closest('.top-picks-section');
+        const products = wrapper.find('.top-picks-products');
+
+        wrapper.find('.top-picks-cat').removeClass('active');
+        btn.addClass('active');
+
+        products.html(wrapper.find('.skeleton-template').html());
+
+        $.post(
+            wc_add_to_cart_params.ajax_url,
+            {
+                action: 'top_picks_filter',
+                cat: cat
+            },
+            function (response) {
+
+                products.html(response);
+
+            }
+        );
+
+    });
+
+});   
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const slider = document.querySelector('.hero-slider');
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.wp-block-cover');
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'swiper-wrapper';
+
+    slides.forEach(slide => {
+
+        slide.classList.add('swiper-slide');
+        wrapper.appendChild(slide);
+
+    });
+
+    slider.classList.add('swiper');
+    slider.appendChild(wrapper);
+
+    const pagination = document.createElement('div');
+    pagination.className = 'swiper-pagination';
+
+    slider.appendChild(pagination);
+
+    new Swiper(slider, {
+        spaceBetween: 24,
+        slidesPerView: 1,
+        loop: true,
+
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false
+        },
+
+        pagination: {
+            el: pagination,
+            clickable: true
+        }
+
+    });
+
+});
+</script>    
+<?php endif;?>
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
-
-    // Check for saved theme in localStorage
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        body.classList.add(savedTheme);
-    } else {
-        body.classList.add('light-mode'); // Default to light mode
-    }
-
-    // Toggle between dark and light mode
-    themeToggle.addEventListener('click', function() {
-        if (body.classList.contains('dark-mode')) {
-            body.classList.remove('dark-mode');
-            body.classList.add('light-mode');
-            localStorage.setItem('theme', 'light-mode');
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark-mode');
-        }
-    });
-});
-
-
-
-  document.addEventListener('DOMContentLoaded', function () {
-    /*** Venobox on the button */
-    // Check if there are any elements with the class .video-btn
-    const videoButtons = document.querySelectorAll('.video-btn > a');
-
-    if (videoButtons.length > 0) {
-      // Add the required attributes to each <a> element inside .video-btn
-      videoButtons.forEach(btn => {
-        btn.setAttribute('data-autoplay', 'true');
-        btn.setAttribute('data-vbtype', 'video');
-      });
-
-      // Initialize Venobox
-      new VenoBox({
-        selector: '.video-btn > a'
-      });
-    }
-/*** end of Venobox on the button */
-
-
-
-    // Select all elements with the class "onscroll-view"
-    const onScrollElements = document.querySelectorAll('.onscroll-view');
-
-    // Create a new IntersectionObserver instance
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        // Check if the element is intersecting (in the viewport)
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-viewport');
-        }/* else {
-                entry.target.classList.remove('in-viewport');
-            }*/
-      });
-    }, {
-      // Set the threshold to 0.1, which means the callback will be triggered when 10% of the element is in the viewport
-      threshold: 0.15
-    });
-
-    // Observe each selected element
-    onScrollElements.forEach((el) => {
-      observer.observe(el);
-    });
-  });
-
-
-
 
   // Initialize Lenis after the document is fully loaded
   document.addEventListener('DOMContentLoaded', function () {

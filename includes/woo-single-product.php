@@ -73,6 +73,7 @@ function add_custom_acf_product_tabs($tabs)
         return $tabs;
 
     $sastav = get_field('sastav', $product->get_id());
+    $deklaracija = get_field('deklaracija', $product->get_id());
     $nacin_pripreme = get_field('nacin_pripreme', $product->get_id());
 
     /**
@@ -90,9 +91,17 @@ function add_custom_acf_product_tabs($tabs)
 
     if (!empty($nacin_pripreme)) {
         $tabs['nacin_pripreme_tab'] = array(
-            'title' => __('Način pripreme', 'woocommerce'),
+            'title' => __('Priprema', 'woocommerce'),
             'priority' => 16,
             'callback' => 'render_nacin_pripreme_tab_content'
+        );
+    }
+
+    if (!empty($nacin_pripreme)) {
+        $tabs['deklaracija_tab'] = array(
+            'title' => __('Deklaracija', 'woocommerce'),
+            'priority' => 17,
+            'callback' => 'render_deklaracija_tab_content'
         );
     }
 
@@ -112,8 +121,17 @@ function render_nacin_pripreme_tab_content()
 {
     global $product;
     echo '<div class="woocommerce-Tabs-panel--nacin-pripreme">';
-    echo '<h5>Jednostavna priprema</h5>';
+    echo '<h5>Priprema</h5>';
     the_field('nacin_pripreme', $product->get_id());
+    echo '</div>';
+}
+
+function render_deklaracija_tab_content()
+{
+    global $product;
+    echo '<div class="woocommerce-Tabs-panel--deklaracija">';
+    echo '<h5>Deklaracija</h5>';
+    the_field('deklaracija', $product->get_id());
     echo '</div>';
 }
 

@@ -155,7 +155,7 @@
         background-color: transparent;
         padding: 0;
         opacity: .9;
-        font-size: 2.4rem;
+        font-size: 2rem;
 
         &:hover {
             color: $cta-color;
@@ -250,6 +250,12 @@
 
 
 
+.wp-block-group.alignfull {
+    > div {
+        max-width: 100%!important;
+        padding: 0;
+    }
+}
 
 
 @media only screen and (max-width:1024px) {
