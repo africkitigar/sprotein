@@ -18,7 +18,7 @@ require_once( get_template_directory() . '/includes/woo-products.php' );
 require_once( get_template_directory() . '/includes/woo-single-product.php' );
 require_once( get_template_directory() . '/includes/woo-checkout.php' );
 require_once( get_template_directory() . '/includes/woo-cart.php' );
-
+require_once( get_template_directory() . '/includes/woo-orders.php' );
 
 add_filter( 'woocommerce_enqueue_styles', '__return_false' );
 
@@ -26,48 +26,6 @@ add_filter( 'woocommerce_enqueue_styles', '__return_false' );
     Theme Support
 \*------------------------------------*/
 
-/*function mytheme_gutenberg_colors() {
-    // Fetch CSS variables via PHP
-    echo '<style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --accent-color: #e74c3c;
-            --dark-color: #2c3e50;
-            --light-color: #ecf0f1;
-        }
-    </style>';
-
-    // Add theme support for custom colors in Gutenberg
-    add_theme_support( 'editor-color-palette', [
-        [
-            'name'  => __( 'Primary', 'mytheme' ),
-            'slug'  => 'primary',
-            'color' => 'var(--primary-color)',
-        ],
-        [
-            'name'  => __( 'Secondary', 'mytheme' ),
-            'slug'  => 'secondary',
-            'color' => 'var(--secondary-color)',
-        ],
-        [
-            'name'  => __( 'Accent', 'mytheme' ),
-            'slug'  => 'accent',
-            'color' => 'var(--accent-color)',
-        ],
-        [
-            'name'  => __( 'Dark', 'mytheme' ),
-            'slug'  => 'dark',
-            'color' => 'var(--dark-color)',
-        ],
-        [
-            'name'  => __( 'Light', 'mytheme' ),
-            'slug'  => 'light',
-            'color' => 'var(--light-color)',
-        ],
-    ] );
-}
-add_action( 'after_setup_theme', 'mytheme_gutenberg_colors' );*/
 
 if (function_exists('add_theme_support')) {
     // Add support for editor color palette.
@@ -188,8 +146,10 @@ function theme_scripts()
         wp_register_script('themescripts', get_template_directory_uri() . '/assets/js/general.js', array('jquery'), '1.0.0'); // Custom scripts
         wp_enqueue_script('themescripts'); // Enqueue it!
 
+        $style_path = get_template_directory() . '/style.min.css';
+        $version = file_exists($style_path) ? filemtime($style_path) : '1.0';
 
-        wp_register_style('main-theme-css', get_template_directory_uri() . '/style.min.css', array(), '1.1', 'all');
+        wp_register_style('main-theme-css', get_template_directory_uri() . '/style.min.css', array(), $version, 'all');
         wp_enqueue_style('main-theme-css'); // Enqueue it!
 
         
@@ -350,33 +310,8 @@ function add_arrow($output, $item, $depth, $args)
     return $output;
 }
 
-
-
 /*
-function add_woocommerce_categories_to_menu($items, $args) {
-    if ($args->theme_location === 'header-menu') { // Adjust this to match your menu location
-        $menu_items = wp_get_nav_menu_items($args->menu);
 
-        foreach ($menu_items as $menu_item) {
-            if ($menu_item->title === 'Produkte') { // Check for "Produkte"
-                $product_categories = get_terms([
-                    'taxonomy'   => 'product_cat',
-                    'hide_empty' => true,
-                ]);
-
-                if (!empty($product_categories)) {
-                    foreach ($product_categories as $category) {
-                        $items .= '<li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat">';
-                        $items .= '<a href="' . get_term_link($category) . '">' . esc_html($category->name) . '</a>';
-                        $items .= '</li>';
-                    }
-                }
-            }
-        }
-    }
-    return $items;
-}
-add_filter('wp_nav_menu_items', 'add_woocommerce_categories_to_menu', 10, 2);*/
 class Custom_WooCommerce_Menu_Walker extends Walker_Nav_Menu {
     function start_el(&$output, $item, $depth = 0, $args = array(), $id = 0) {
         // Output the default menu item
@@ -404,13 +339,13 @@ class Custom_WooCommerce_Menu_Walker extends Walker_Nav_Menu {
             }
         }
     }
-}
+}*/
 
 
 /*------------------------------------*\
     EXTEND NAV WAKLER FOR MOBILE MEGA MENU
 \*------------------------------------*/
-class dynamicSubMenu extends Walker_Nav_Menu
+/*class dynamicSubMenu extends Walker_Nav_Menu
 {
     function start_lvl(&$output, $depth = 0, $args = array())
     {
@@ -424,7 +359,7 @@ class dynamicSubMenu extends Walker_Nav_Menu
     }
 
 
-} //class
+}*/ //class
 
 
 /*------------------------------------*\
@@ -506,62 +441,8 @@ function my_remove_recent_comments_style()
 }
 add_action('widgets_init', 'my_remove_recent_comments_style'); // Remove inline Recent Comment Styles from wp_head()
 
-// Threaded Comments
-function enable_threaded_comments()
-{
-    if (!is_admin()) {
-        if (is_singular() and comments_open() and (get_option('thread_comments') == 1)) {
-            wp_enqueue_script('comment-reply');
-        }
-    }
-}
 
-// Custom Comments Callback
-function greenthemecomments($comment, $args, $depth)
-{
-    $GLOBALS['comment'] = $comment;
-    extract($args, EXTR_SKIP);
 
-    if ('div' == $args['style']) {
-        $tag = 'div';
-        $add_below = 'comment';
-    } else {
-        $tag = 'li';
-        $add_below = 'div-comment';
-    }
-    ?>
-    <!-- heads up: starting < for the html tag (li or div) in the next line: -->
-    <<?php echo $tag ?>     <?php comment_class(empty($args['has_children']) ? '' : 'parent') ?>
-        id="comment-<?php comment_ID() ?>">
-        <?php if ('div' != $args['style']): ?>
-            <div id="div-comment-<?php comment_ID() ?>" class="comment-body">
-            <?php endif; ?>
-            <div class="comment-author vcard">
-                <?php if ($args['avatar_size'] != 0)
-                    echo get_avatar($comment, $args['180']); ?>
-                <?php printf(__('<cite class="fn">%s</cite> <span class="says">says:</span>'), get_comment_author_link()) ?>
-            </div>
-            <?php if ($comment->comment_approved == '0'): ?>
-                <em class="comment-awaiting-moderation"><?php _e('Your comment is awaiting moderation.') ?></em>
-                <br />
-            <?php endif; ?>
-
-            <div class="comment-meta commentmetadata"><a
-                    href="<?php echo htmlspecialchars(get_comment_link($comment->comment_ID)) ?>">
-                    <?php
-                    printf(__('%1$s at %2$s'), get_comment_date(), get_comment_time()) ?></a><?php edit_comment_link(__('(Edit)'), '  ', '');
-                       ?>
-            </div>
-
-            <?php comment_text() ?>
-
-            <div class="reply">
-                <?php comment_reply_link(array_merge($args, array('add_below' => $add_below, 'depth' => $depth, 'max_depth' => $args['max_depth']))) ?>
-            </div>
-            <?php if ('div' != $args['style']): ?>
-            </div>
-        <?php endif; ?>
-    <?php }
 
 
 
@@ -639,7 +520,7 @@ add_action('init', 'greentheme_pagination');
 
 
 /*** mobile picture for wp block cover ****/
-add_action('enqueue_block_editor_assets', 'enqueue_responsive_cover', 100);
+/*add_action('enqueue_block_editor_assets', 'enqueue_responsive_cover', 100);
 
 function enqueue_responsive_cover()
 {
@@ -667,26 +548,7 @@ function my_responsive_cover_render($content, $block)
     return $content;
 }
 
-
-
-
-
-
-// Disable users rest routes
-/*add_filter('rest_endpoints', function( $endpoints ) {
-    if ( isset( $endpoints['/wp/v2/users'] ) ) {
-        unset( $endpoints['/wp/v2/users'] );
-    }
-    if ( isset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] ) ) {
-        unset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] );
-    }
-    return $endpoints;
-});
-
 */
-
-
-
 
 
 

@@ -121,3 +121,27 @@ add_filter('rest_endpoints', function ($endpoints) {
     unset($endpoints['/wp/v2/comments']);
     return $endpoints;
 });
+
+// Sklanja komentare iz Admin menija
+add_action('admin_menu', function () {
+    remove_menu_page('edit-comments.php');
+});
+
+// Sklanja komentare iz Admin Bara
+add_action('wp_before_admin_bar_render', function () {
+    global $wp_admin_bar;
+    $wp_admin_bar->remove_menu('comments');
+});
+
+// Preusmerava svakoga ko pokuša da pristupi stranici za komentare u adminu
+add_action('admin_init', function () {
+    global $pagenow;
+    if ($pagenow === 'edit-comments.php') {
+        wp_redirect(admin_url());
+        exit;
+    }
+});
+
+/**
+ * end of - Disable comments & WooCommerce reviews completely
+ */

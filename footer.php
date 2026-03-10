@@ -85,6 +85,10 @@ jQuery(function ($) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+
+
+
+
     const slider = document.querySelector('.hero-slider');
     if (!slider) return;
 
@@ -112,6 +116,8 @@ document.addEventListener("DOMContentLoaded", function () {
         spaceBetween: 24,
         slidesPerView: 1,
         loop: true,
+        speed: 2300,
+        parallax: true,
 
         autoplay: {
             delay: 5000,
@@ -124,6 +130,21 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     });
+
+
+/*
+    slides.forEach(slide => {
+
+    slide.classList.add('swiper-slide');
+
+    const bg = slide.querySelector('.wp-block-cover__image-background');
+    if (bg) {
+        bg.setAttribute('data-swiper-parallax', '-20%');
+    }
+
+    wrapper.appendChild(slide);
+
+});*/
 
 });
 </script>    

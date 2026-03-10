@@ -475,6 +475,31 @@ add_action('wp_footer', 'add_woocommerce_category_accordion');
 
 
 
+/**
+ * Category bottom description (ACF field)
+ */
+add_action('woocommerce_after_shop_loop', 'wc_category_bottom_description', 20);
+function wc_category_bottom_description() {
+
+    if (!is_product_category()) {
+        return;
+    }
+
+    $term = get_queried_object();
+
+    if (!$term || empty($term->term_id)) {
+        return;
+    }
+
+    $bottom_description = get_field('bottom_description', 'product_cat_' . $term->term_id);
+
+    if ($bottom_description) {
+        echo '<div class="category-bottom-description">';
+        echo wp_kses_post($bottom_description);
+        echo '</div>';
+    }
+}
+
 
 
 

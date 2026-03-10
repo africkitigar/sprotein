@@ -256,7 +256,7 @@ function custom_featured_products_slider()
                 breakpoints: {
                     1600: { slidesPerView: 5.5 },
                     1024: { slidesPerView: 3.7 },
-                    480: { slidesPerView: 2.8 },
+                    480: { slidesPerView: 1.6 },
                 }
             });
         });
@@ -328,8 +328,13 @@ add_shortcode('popular_categories', function ($atts) {
 
                 <?php foreach ($terms as $term):
 
-                    $thumbnail_id = get_term_meta($term->term_id, 'thumbnail_id', true);
-                    $image = wp_get_attachment_image_url($thumbnail_id, 'large');
+                   // $thumbnail_id = get_term_meta($term->term_id, 'thumbnail_id', true);
+                    //$image = wp_get_attachment_image_url($thumbnail_id, 'large');
+                    $image_id = get_field('additional_category_image', 'product_cat_' . $term->term_id);
+
+                    if ($image_id) {
+                        $image = wp_get_attachment_image_url($image_id, 'large');
+                    }
 
                     $link = get_term_link($term);
                     ?>
@@ -361,7 +366,7 @@ add_shortcode('popular_categories', function ($atts) {
     <script>
         new Swiper('.popular-categories-slider', {
 
-            slidesPerView: 2.5,
+            slidesPerView: 1.6,
             spaceBetween: 24,
 
             breakpoints: {

@@ -195,3 +195,10 @@ function customize_gallery_markup($block_content, $block) {
     return $block_content;
 }
 add_filter('render_block', 'customize_gallery_markup', 10, 2);
+
+
+
+
+
+
+

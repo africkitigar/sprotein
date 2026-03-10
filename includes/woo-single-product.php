@@ -179,6 +179,27 @@ add_action('woocommerce_after_add_to_cart_form', function () {
             <span>Rok za dostavu paketa na teritoriji Republike Srbije <strong>2 radna dana</strong></span>
         </div>
 
+        <?php 
+            global $product;
+            
+            if($product->is_on_sale()):
+
+            $start = date_i18n('d. m.', strtotime('first day of this month'));
+            $end = date_i18n('d. m. Y.', strtotime('last day of this month'));
+        ?>
+        <div class="delivery-item sale-validity">
+            <span class="delivery-icon">
+                <!-- Clock -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="5" x2="5" y2="19"/>
+                    <circle cx="6.5" cy="6.5" r="2.5"/>
+                    <circle cx="17.5" cy="17.5" r="2.5"/>
+                </svg>
+            </span>
+            <span><?php  echo 'Ova akcija važi od ' . esc_html($start) . ' do ' . esc_html($end); ?></span>
+        </div>
+        <?php endif; //product is on sale ?>
+
     </div>
     <?php
 });
