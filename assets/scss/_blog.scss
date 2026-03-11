@@ -189,3 +189,11 @@
         }
     }
 }
+
+
+
+@media only screen and (max-width:781px) {
+    #posts-feed {
+        grid-template-columns: repeat(1, 1fr)!important;
+    }
+}

@@ -196,34 +196,5 @@ $action_tag = get_field('action_tag', $product_id);
 
     });
 </script>
-<style>
-    .bundle-preview{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:20px;
-}
 
-.bundle-slot{
-    border:2px dashed #ddd;
-    border-radius:12px;
-    padding:20px;
-    text-align:center;
-    min-height:220px;
-}
-
-.bundle-product img{
-    max-width:120px;
-    margin-bottom:10px;
-}
-
-.bundle-flavor{
-    display:block;
-    font-size:14px;
-    color:#666;
-}
-
-.bundle-slot.free{
-    border-color:#22c55e;
-}
-</style>
 <?php get_footer('shop'); ?>
