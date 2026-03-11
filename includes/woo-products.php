@@ -282,7 +282,7 @@ function custom_woocommerce_variable_sale_percentage($html, $post, $product)
 
 
 // Change the "View Cart" button URL to the checkout page after adding to cart
-add_filter('woocommerce_add_to_cart_fragments', function($fragments){
+/*add_filter('woocommerce_add_to_cart_fragments', function($fragments){
 
     ob_start();
     ?>
@@ -307,6 +307,20 @@ add_filter('woocommerce_add_to_cart_fragments', function($fragments){
     $fragments['a.cart-contents'] = ob_get_clean();
 
     return $fragments;
+});*/
+add_filter('woocommerce_add_to_cart_fragments', function($fragments){
+
+    ob_start();
+    ?>
+    <span class="cart-count cart-contents">
+        <?php echo WC()->cart->get_cart_contents_count(); ?>
+    </span>
+    <?php
+
+    $fragments['.cart-count'] = ob_get_clean();
+
+    return $fragments;
+
 });
 
 
@@ -917,69 +931,6 @@ jQuery(function($){
 
 
 
-add_action('wp_ajax_add_bundle_to_cart', 'add_bundle_to_cart');
-add_action('wp_ajax_nopriv_add_bundle_to_cart', 'add_bundle_to_cart');
-
-function add_bundle_to_cart() {
-
-    $ids = $_POST['products'];
-
-    foreach ($ids as $key => $id) {
-
-        if ($key == 2) {
-            WC()->cart->add_to_cart($id, 1, 0, [], ['is_free_flavor' => true]);
-        } else {
-            WC()->cart->add_to_cart($id, 1);
-        }
-    }
-
-    WC_AJAX::get_refreshed_fragments(); 
-}
-
-add_action('wp_footer', function() {
-if (!is_product()) return;
-?>
-
-<script>
-jQuery(function($){
-
-    $('.special-bundle-form').on('submit', function(e){
-        e.preventDefault();
-
-        const products = [
-            $('select[name="flavor_1"]').val(),
-            $('select[name="flavor_2"]').val(),
-            $('select[name="flavor_3"]').val(),
-        ];
-
-        $.ajax({
-            type: 'POST',
-            url: '<?php echo admin_url('admin-ajax.php'); ?>',
-            data: {
-                action: 'add_bundle_to_cart',
-                products: products
-            },
-            success: function(response){
-
-                if(response.fragments){
-
-                    $.each(response.fragments, function(key, value){
-                        $(key).replaceWith(value);
-                    });
-
-                }
-
-                $('.bundle-success').fadeIn();
-            }
-        });
-
-    });
-
-});
-</script>
-
-<?php
-});
 
 
 

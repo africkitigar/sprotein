@@ -489,6 +489,45 @@
 }
 
 @media only screen and (max-width:767px) {
+    .special-product-layout {
+        .special-header {
+            h1 {
+                font-size: 3.3rem!important;
+            }
+            .tag-subtitle {
+                font-size: 2rem!important;
+            }
+        }
+        .special-product-grid {
+            gap: 2.4rem!important;
+            grid-template-columns: 1fr!important;
+
+            .select-group {
+                select {
+                    width: 100%;
+                }
+            }
+
+            .bundle-preview {
+                gap: 1.6rem!important;
+                display: flex!important;
+                max-width: 100%;
+
+                h4 {
+                    font-size: 1.4rem!important;
+                }
+
+                .bundle-slot {
+                    max-width: 100%;
+                    min-height: 15rem!important;
+                }
+
+                img {
+                    width: 100%;
+                }
+            }
+        }
+    }
     .upsell-products {
         padding: 1.6rem!important;
         ul.products {
@@ -564,6 +603,75 @@ header ul:not([class]),
             background-size: contain;
             width: 1.8rem;
             height: 1.8rem;
+        }
+    }
+}
+
+
+
+
+
+.special-product-layout {
+    padding-bottom: 4.8rem;
+
+    .special-header {
+        text-align: center;
+        margin-bottom: 3.2rem;
+
+        .tag-subtitle {
+            font-size: 2.7rem;
+            font-weight: 300;
+
+            b {
+                text-transform: uppercase;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+            }
+        }
+
+        img {
+            border-radius: 1.6rem;
+        }
+    }
+
+    .special-product-grid {
+        display: grid;
+        gap:4.8rem;
+        grid-template-columns: 1fr 2fr;
+
+        .bundle-preview {
+            h4 {
+                margin-bottom: 0;
+                font-size: 1.8rem;
+                text-transform: uppercase;
+                text-align: center;
+            }
+        }
+
+        .special-bundle-form {
+            .select-group {
+                margin-bottom: 1.6rem;
+
+                select {
+                    max-width: 100%;
+                    width: 100%;
+                    box-sizing: border-box;
+                    white-space: normal; 
+                    text-overflow: ellipsis;
+                }
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .bundle-success {
+                background-color: $green;
+                margin-top: 1.6rem;
+                padding: .8rem;
+                text-align: center;
+                border-radius: 1.6rem;
+            }
         }
     }
 }

@@ -240,7 +240,7 @@
     }
 }
 
-.cart-contents {
+.cart-contents-wrap {
     position: relative;
     text-decoration: none;
     color: $secondary-color;
@@ -387,7 +387,7 @@
                 order: 1;
             }
 
-            .cart-contents {
+            .cart-contents-wrap {
                 order: 2;
                 margin-left: auto;
             }

@@ -1,12 +1,12 @@
 <?php
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
-get_header( 'shop' );
+get_header('shop');
 
 global $product;
 
 $product_id = get_the_ID();
-$action_tag = get_field( 'action_tag', $product_id );
+$action_tag = get_field('action_tag', $product_id);
 
 ?>
 
@@ -14,55 +14,26 @@ $action_tag = get_field( 'action_tag', $product_id );
 
     <?php woocommerce_breadcrumb(); ?>
 
+    <div class="special-header">
+        <h1><?php echo get_the_title(); ?></h1>
+        <?php
+        $tag = get_term($action_tag, 'product_tag');
+
+        if (!is_wp_error($tag) && $tag !== null) {
+            ?>
+            <h2 class="tag-subtitle"><b><?php echo $tag->name; ?></b> - izaberi svoju kombinaciju</h2>
+        <?php }//has tag ?>
+
+        <?php
+        if (has_post_thumbnail($product_id)) {
+            echo get_the_post_thumbnail($product_id, 'large');
+        } ?>
+    </div>
+
     <div class="special-product-grid">
 
         <!-- LEFT SIDE -->
         <div class="special-left">
-
-            <h3>Izaberi ukus</h3>
-
-            <?php
-            $args = [
-                'post_type' => 'product',
-                'posts_per_page' => -1,
-                'tax_query' => [
-                    [
-                        'taxonomy' => 'product_tag',
-                        'field'    => 'term_id',
-                        'terms'    => $action_tag,
-                    ],
-                ],
-            ];
-
-            $flavors = new WP_Query($args);
-
-            if ( $flavors->have_posts() ) :
-                while ( $flavors->have_posts() ) : $flavors->the_post();
-                    global $product;
-                    ?>
-
-                    <a href="<?php the_permalink(); ?>" class="special-related-item">
-
-                        <div class="related-thumb">
-                            <?php echo $product->get_image( 'thumbnail' ); ?>
-                        </div>
-
-                        <div class="related-info">
-                            <h4><?php the_title(); ?></h4>
-                            <span class="price"><?php echo $product->get_price_html(); ?></span>
-                        </div>
-
-                    </a>
-
-                <?php endwhile;
-                wp_reset_postdata();
-            endif;
-            ?>
-
-        </div>
-
-        <!-- RIGHT SIDE -->
-        <div class="special-right">
 
             <form class="special-bundle-form">
 
@@ -73,8 +44,8 @@ $action_tag = get_field( 'action_tag', $product_id );
                     'tax_query' => [
                         [
                             'taxonomy' => 'product_tag',
-                            'field'    => 'term_id',
-                            'terms'    => $action_tag,
+                            'field' => 'term_id',
+                            'terms' => $action_tag,
                         ],
                     ],
                 ]);
@@ -83,9 +54,18 @@ $action_tag = get_field( 'action_tag', $product_id );
                 <div class="select-group">
                     <label>Izaberi ukus 1</label>
                     <select name="flavor_1" required>
-                        <?php foreach ($products as $p) : ?>
-                            <option value="<?php echo $p->get_id(); ?>">
-                                <?php echo $p->get_name(); ?>
+                        <option value="" disabled selected hidden>Izaberite ukus...</option>
+                        <?php foreach ($products as $p):
+
+                            $image = wp_get_attachment_image_url($p->get_image_id(), 'medium');
+
+                            $ukus = $p->get_attribute('ukusi'); // atribut ukusi
+                        
+                            ?>
+                            <option value="<?php echo $p->get_id(); ?>" data-image="<?php echo esc_url($image); ?>"
+                                data-name="<?php echo esc_attr($p->get_name()); ?>"
+                                data-ukus="<?php echo esc_attr($ukus); ?>">
+                                <?php echo $ukus; ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -94,22 +74,46 @@ $action_tag = get_field( 'action_tag', $product_id );
                 <div class="select-group">
                     <label>Izaberi ukus 2</label>
                     <select name="flavor_2" required>
-                        <?php foreach ($products as $p) : ?>
-                            <option value="<?php echo $p->get_id(); ?>">
-                                <?php echo $p->get_name(); ?>
-                            </option>
-                        <?php endforeach; ?>
+                        <option value="" disabled selected hidden>Izaberite ukus...</option>
+<?php foreach ($products as $p) : 
+
+    $image = wp_get_attachment_image_url($p->get_image_id(),'medium');
+
+    $ukus = $p->get_attribute('ukusi'); // atribut ukusi
+
+?>
+<option 
+    value="<?php echo $p->get_id(); ?>"
+    data-image="<?php echo esc_url($image); ?>"
+    data-name="<?php echo esc_attr($p->get_name()); ?>"
+    data-ukus="<?php echo esc_attr($ukus); ?>"
+>
+    <?php echo $ukus; ?>
+</option>
+<?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="select-group">
                     <label>Izaberi ukus 3 <strong>(Besplatan)</strong></label>
                     <select name="flavor_3" required>
-                        <?php foreach ($products as $p) : ?>
-                            <option value="<?php echo $p->get_id(); ?>">
-                                <?php echo $p->get_name(); ?>
-                            </option>
-                        <?php endforeach; ?>
+                        <option value="" disabled selected hidden>Izaberite ukus...</option>
+     <?php foreach ($products as $p) : 
+
+    $image = wp_get_attachment_image_url($p->get_image_id(),'medium');
+
+    $ukus = $p->get_attribute('ukusi'); // atribut ukusi
+
+?>
+<option 
+    value="<?php echo $p->get_id(); ?>"
+    data-image="<?php echo esc_url($image); ?>"
+    data-name="<?php echo esc_attr($p->get_name()); ?>"
+    data-ukus="<?php echo esc_attr($ukus); ?>"
+>
+    <?php echo $ukus; ?>
+</option>
+<?php endforeach; ?>
                     </select>
                 </div>
 
@@ -125,8 +129,101 @@ $action_tag = get_field( 'action_tag', $product_id );
 
         </div>
 
+        <!-- RIGHT SIDE -->
+        <div class="special-right">
+
+            <div class="bundle-preview">
+
+                <div class="bundle-slot" data-slot="1">
+                    <div class="bundle-placeholder">
+                        Izaberi ukus
+                    </div>
+                </div>
+
+                <div class="bundle-slot" data-slot="2">
+                    <div class="bundle-placeholder">
+                        Izaberi ukus
+                    </div>
+                </div>
+
+                <div class="bundle-slot free" data-slot="3">
+                    <div class="bundle-placeholder">
+                        Gratis
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
 
-<?php get_footer( 'shop' ); ?>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        function updateSlot(select, slotNumber) {
+
+            const option = select.options[select.selectedIndex];
+
+            const img = option.dataset.image;
+            const name = option.dataset.name;
+            const ukus = option.dataset.ukus;
+
+            const slot = document.querySelector('.bundle-slot[data-slot="' + slotNumber + '"]');
+
+            slot.innerHTML = `
+            <div class="bundle-product">
+                <img src="${img}" alt="">
+                <h4>${ukus}</h4>
+            </div>
+        `;
+        }
+
+        document.querySelector('[name="flavor_1"]').addEventListener('change', function () {
+            updateSlot(this, 1);
+        });
+
+        document.querySelector('[name="flavor_2"]').addEventListener('change', function () {
+            updateSlot(this, 2);
+        });
+
+        document.querySelector('[name="flavor_3"]').addEventListener('change', function () {
+            updateSlot(this, 3);
+        });
+
+    });
+</script>
+<style>
+    .bundle-preview{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.bundle-slot{
+    border:2px dashed #ddd;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+    min-height:220px;
+}
+
+.bundle-product img{
+    max-width:120px;
+    margin-bottom:10px;
+}
+
+.bundle-flavor{
+    display:block;
+    font-size:14px;
+    color:#666;
+}
+
+.bundle-slot.free{
+    border-color:#22c55e;
+}
+</style>
+<?php get_footer('shop'); ?>

@@ -19,6 +19,7 @@ require_once( get_template_directory() . '/includes/woo-single-product.php' );
 require_once( get_template_directory() . '/includes/woo-checkout.php' );
 require_once( get_template_directory() . '/includes/woo-cart.php' );
 require_once( get_template_directory() . '/includes/woo-orders.php' );
+require_once( get_template_directory() . '/includes/promo-21.php' );
 
 add_filter( 'woocommerce_enqueue_styles', '__return_false' );
 
