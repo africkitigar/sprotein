@@ -532,7 +532,7 @@ function wc_category_bottom_description() {
 
 
 
-
+/*
 
 function sp_get_protein_promo_message() {
 
@@ -588,7 +588,7 @@ function sp_get_protein_promo_message() {
 
   return '';
 }
-
+*/
 
 
 add_action('woocommerce_cart_calculate_fees', 'sp_apply_protein_2plus1_discount');
