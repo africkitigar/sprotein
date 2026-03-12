@@ -954,3 +954,77 @@ add_action( 'woocommerce_before_calculate_totals', function( $cart ) {
     }
 
 });
+
+
+
+
+
+
+
+
+/**
+ * Custom related heading regarding the tag of the product
+ */
+add_filter('woocommerce_product_related_products_heading', function($heading){
+
+    if (!is_product()) {
+        return $heading;
+    }
+
+    global $product;
+
+    $tags = wp_get_post_terms($product->get_id(), 'product_tag', ['fields'=>'ids']);
+
+    if (in_array(30, $tags)) {
+        return 'Ostali Ultra Whey ukusi';
+    }
+
+    if (in_array(31, $tags)) {
+        return 'Ostali Strong Whey ukusi';
+    }
+
+    return $heading;
+
+});
+/**
+ * Custom query for related products if they are in specific tags
+ */
+add_filter('woocommerce_related_products', function($related_ids, $product_id, $args){
+
+    $target_tags = [30,31];
+
+    $tags = wp_get_post_terms($product_id,'product_tag',['fields'=>'ids']);
+
+    $matched = array_intersect($tags,$target_tags);
+
+    if(!$matched){
+        return $related_ids;
+    }
+
+    $query = new WP_Query([
+        'post_type' => 'product',
+        'posts_per_page' => 4,
+        'post__not_in' => [$product_id],
+        'tax_query' => [
+            [
+                'taxonomy' => 'product_tag',
+                'field' => 'term_id',
+                'terms' => $matched
+            ]
+        ]
+    ]);
+
+    if($query->have_posts()){
+
+        $ids = [];
+
+        foreach($query->posts as $p){
+            $ids[] = $p->ID;
+        }
+
+        return $ids;
+    }
+
+    return $related_ids;
+
+},10,3);
