@@ -356,8 +356,18 @@ add_filter('wc_add_to_cart_message_html', function ($message, $products) {
 
 
 
+add_filter('woocommerce_page_title', function($title){
 
+    if (is_search()) {
+        global $wp_query;
 
+        $count = $wp_query->found_posts;
+        $title = 'Pronađeno ' . $count . ' proizvoda za: ' . get_search_query();
+    }
+
+    return $title;
+
+});
 
 
 

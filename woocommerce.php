@@ -31,16 +31,31 @@ if ( is_product_category() ) {
 ?>
 
             <?php
+            $search = get_search_query();
+
             if (is_product_category()) {
                 $term = get_queried_object();
                 echo '<h1 class="shop-title">' . esc_html($term->name) . '</h1>';
             } elseif (is_product_tag()) {
                 $term = get_queried_object();
                 echo '<h1 class="shop-title">' . esc_html($term->name) . '</h1>';
-            } elseif (is_shop()) {
+            } elseif (is_shop() & !$search) {
                 echo '<h1 class="shop-title">Prodavnica</h1>';
-            }
+            } 
+            
             ?>
+
+            <h1 class="shop-title">
+            <?php
+
+            
+
+            if ($search) {
+                echo 'Rezultati pretrage za: ' . esc_html($search);
+            } 
+
+            ?>
+            </h1>
 
             <div class="shop-header-meta">
                 <?php

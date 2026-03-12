@@ -204,3 +204,23 @@
         opacity: .8;
     }
 }
+
+
+
+.woocommerce-shop {
+    .product-category  {
+        a {
+            color: $secondary-color;
+            
+
+            .woocommerce-loop-category__title {
+                font-size: 2rem!important;
+                margin-top: 1.2rem;
+
+                mark {
+                    background-color: transparent;
+                }
+            }
+        }
+    }
+}

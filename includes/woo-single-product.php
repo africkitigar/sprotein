@@ -62,6 +62,15 @@ add_filter('use_block_editor_for_post_type', 'enable_gutenberg_for_products', 10
 /**
  * Custom tabs on single product
  */
+add_filter('woocommerce_product_tabs', function($tabs){
+
+    unset($tabs['additional_information']);
+    unset($tabs['reviews']);
+
+    return $tabs;
+
+}, 98);
+
 add_filter('woocommerce_product_tabs', 'add_custom_acf_product_tabs', 20);
 
 function add_custom_acf_product_tabs($tabs)

@@ -155,6 +155,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize Lenis after the document is fully loaded
   document.addEventListener('DOMContentLoaded', function () {
+    const searchToggle = document.getElementById('search-toggle');
+    const searchBar = document.getElementById('header-search-bar');
+     // Otvori/zatvori pretragu
+    searchToggle.addEventListener('click', function() {
+        searchBar.classList.toggle('active');
+    });
+    // klik van search bar-a zatvara search
+    document.addEventListener('click', function(e) {
+
+        if (
+            !searchBar.contains(e.target) &&
+            !searchToggle.contains(e.target)
+        ) {
+            searchBar.classList.remove('active');
+        }
+
+    });
+
+
     const lenis = new Lenis({
       // Options for Lenis
       duration: 1.2, // Duration of the scroll animation

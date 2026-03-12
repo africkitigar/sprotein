@@ -87,11 +87,15 @@
 						<div class="bar3"></div>
 					</div>
 
-					<button id="theme-toggle" class="theme-toggle" style="display:none">
-						<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
-							<path
-								d="M24.75 10.5159V10.125C24.75 9.52826 24.513 8.95597 24.091 8.53401C23.6691 8.11205 23.0968 7.875 22.5 7.875H19.125V2.25C19.125 1.95163 19.0065 1.66548 18.7955 1.4545C18.5845 1.24353 18.2984 1.125 18 1.125C17.7017 1.125 17.4155 1.24353 17.2045 1.4545C16.9936 1.66548 16.875 1.95163 16.875 2.25V7.875H13.5C12.9033 7.875 12.331 8.11205 11.909 8.53401C11.4871 8.95597 11.25 9.52826 11.25 10.125V10.5159C8.55372 11.7899 6.27562 13.8048 4.68193 16.3253C3.08823 18.8459 2.24474 21.7679 2.25002 24.75C2.25002 25.0484 2.36855 25.3345 2.57953 25.5455C2.79051 25.7565 3.07666 25.875 3.37502 25.875H12.375C12.375 27.3668 12.9677 28.7976 14.0225 29.8525C15.0774 30.9074 16.5082 31.5 18 31.5C19.4919 31.5 20.9226 30.9074 21.9775 29.8525C23.0324 28.7976 23.625 27.3668 23.625 25.875H32.625C32.9234 25.875 33.2095 25.7565 33.4205 25.5455C33.6315 25.3345 33.75 25.0484 33.75 24.75C33.7553 21.7679 32.9118 18.8459 31.3181 16.3253C29.7244 13.8048 27.4463 11.7899 24.75 10.5159ZM18 29.25C17.1049 29.25 16.2465 28.8944 15.6135 28.2615C14.9806 27.6286 14.625 26.7701 14.625 25.875H21.375C21.375 26.7701 21.0194 27.6286 20.3865 28.2615C19.7536 28.8944 18.8951 29.25 18 29.25ZM4.54643 23.625C4.74857 21.158 5.62655 18.7944 7.08399 16.7936C8.54143 14.7929 10.522 13.2325 12.8082 12.2836C13.0123 12.1984 13.1869 12.0549 13.3099 11.8711C13.433 11.6873 13.4991 11.4712 13.5 11.25V10.125H22.5V11.25C22.5001 11.4719 22.5659 11.6889 22.689 11.8736C22.8121 12.0582 22.9871 12.2024 23.1919 12.2878C25.4775 13.2364 27.4576 14.7962 28.915 16.7961C30.3724 18.796 31.2507 21.1587 31.4536 23.625H4.54643Z"
-								fill="black" />
+					<button id="search-toggle" class="header-icon search-icon" aria-label="Pretraga">
+						<svg width="27px" height="27px" viewBox="0 -0.5 25 25" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path fill-rule="evenodd" clip-rule="evenodd"
+								d="M5.5 10.7655C5.50003 8.01511 7.44296 5.64777 10.1405 5.1113C12.8381 4.57483 15.539 6.01866 16.5913 8.55977C17.6437 11.1009 16.7544 14.0315 14.4674 15.5593C12.1804 17.0871 9.13257 16.7866 7.188 14.8415C6.10716 13.7604 5.49998 12.2942 5.5 10.7655Z"
+								stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							</path>
+							<path d="M17.029 16.5295L19.5 19.0005" stroke="#000000" stroke-width="1.5"
+								stroke-linecap="round" stroke-linejoin="round"></path>
 						</svg>
 					</button>
 
@@ -107,4 +111,27 @@
 						</a>
 					<?php endif; ?>
 				</div><!-- /container -->
-			</div>
+
+				<div id="header-search-bar" class="header-search-bar">
+					<div class="header-search-bar-inner">
+					<form role="search" method="get" class="woocommerce-product-search"
+						action="<?php echo esc_url(home_url('/')); ?>">
+
+						<input type="search" class="search-field" placeholder="Pretraži proizvode…"
+							value="<?php echo get_search_query(); ?>" name="s" />
+						<input type="hidden" name="post_type" value="product" />
+						<button type="submit" class="search-submit"><svg width="27px" height="27px" viewBox="0 -0.5 25 25"
+								fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path fill-rule="evenodd" clip-rule="evenodd"
+									d="M5.5 10.7655C5.50003 8.01511 7.44296 5.64777 10.1405 5.1113C12.8381 4.57483 15.539 6.01866 16.5913 8.55977C17.6437 11.1009 16.7544 14.0315 14.4674 15.5593C12.1804 17.0871 9.13257 16.7866 7.188 14.8415C6.10716 13.7604 5.49998 12.2942 5.5 10.7655Z"
+									stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M17.029 16.5295L19.5 19.0005" stroke="#000000" stroke-width="1.5"
+									stroke-linecap="round" stroke-linejoin="round" />
+							</svg></button>
+					</form>
+					</div>
+				</div>
+			</div><!-- /header-bottom -->
+
+
+
