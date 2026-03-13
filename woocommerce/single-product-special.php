@@ -8,6 +8,28 @@ global $product;
 $product_id = get_the_ID();
 $action_tag = get_field('action_tag', $product_id);
 
+$price = 0;
+
+// nađi jedan proizvod iz tog taga
+$products = wc_get_products([
+    'limit' => 1,
+    'status' => 'publish',
+    'tax_query' => [
+        [
+            'taxonomy' => 'product_tag',
+            'field' => 'term_id',
+            'terms' => $action_tag,
+        ],
+    ],
+]);
+
+if (!empty($products)) {
+    $price = (float) $products[0]->get_price();
+}
+
+$old_total = $price * 3;
+$new_total = $price * 2;
+$savings = $old_total - $new_total;
 ?>
 
 <div class="container special-product-layout">
@@ -21,8 +43,20 @@ $action_tag = get_field('action_tag', $product_id);
 
         if (!is_wp_error($tag) && $tag !== null) {
             ?>
-            <h2 class="tag-subtitle"><b><?php echo $tag->name; ?></b> - izaberi svoju kombinaciju</h2>
+            <h2 class="tag-subtitle"><b><?php echo $tag->name; ?></b> - izaberi svoju kombinaciju i uštedi <?php echo wc_price($savings); ?></h2>
         <?php }//has tag ?>
+
+        <div class="special-header-price">
+            <span>Kupi 3 za samo </span>
+            <del class="price-old">
+                <?php echo wc_price($old_total); ?>
+            </del>
+
+            <span class="price-new">
+                <?php echo wc_price($new_total); ?>
+            </span>
+
+        </div>
 
         <?php
         if (has_post_thumbnail($product_id)) {
@@ -75,22 +109,19 @@ $action_tag = get_field('action_tag', $product_id);
                     <label>Izaberi ukus 2</label>
                     <select name="flavor_2" required>
                         <option value="" disabled selected hidden>Izaberite ukus...</option>
-<?php foreach ($products as $p) : 
+                        <?php foreach ($products as $p):
 
-    $image = wp_get_attachment_image_url($p->get_image_id(),'medium');
+                            $image = wp_get_attachment_image_url($p->get_image_id(), 'medium');
 
-    $ukus = $p->get_attribute('ukusi'); // atribut ukusi
-
-?>
-<option 
-    value="<?php echo $p->get_id(); ?>"
-    data-image="<?php echo esc_url($image); ?>"
-    data-name="<?php echo esc_attr($p->get_name()); ?>"
-    data-ukus="<?php echo esc_attr($ukus); ?>"
->
-    <?php echo $ukus; ?>
-</option>
-<?php endforeach; ?>
+                            $ukus = $p->get_attribute('ukusi'); // atribut ukusi
+                        
+                            ?>
+                            <option value="<?php echo $p->get_id(); ?>" data-image="<?php echo esc_url($image); ?>"
+                                data-name="<?php echo esc_attr($p->get_name()); ?>"
+                                data-ukus="<?php echo esc_attr($ukus); ?>">
+                                <?php echo $ukus; ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
@@ -98,22 +129,19 @@ $action_tag = get_field('action_tag', $product_id);
                     <label>Izaberi ukus 3 <strong>(Besplatan)</strong></label>
                     <select name="flavor_3" required>
                         <option value="" disabled selected hidden>Izaberite ukus...</option>
-     <?php foreach ($products as $p) : 
+                        <?php foreach ($products as $p):
 
-    $image = wp_get_attachment_image_url($p->get_image_id(),'medium');
+                            $image = wp_get_attachment_image_url($p->get_image_id(), 'medium');
 
-    $ukus = $p->get_attribute('ukusi'); // atribut ukusi
-
-?>
-<option 
-    value="<?php echo $p->get_id(); ?>"
-    data-image="<?php echo esc_url($image); ?>"
-    data-name="<?php echo esc_attr($p->get_name()); ?>"
-    data-ukus="<?php echo esc_attr($ukus); ?>"
->
-    <?php echo $ukus; ?>
-</option>
-<?php endforeach; ?>
+                            $ukus = $p->get_attribute('ukusi'); // atribut ukusi
+                        
+                            ?>
+                            <option value="<?php echo $p->get_id(); ?>" data-image="<?php echo esc_url($image); ?>"
+                                data-name="<?php echo esc_attr($p->get_name()); ?>"
+                                data-ukus="<?php echo esc_attr($ukus); ?>">
+                                <?php echo $ukus; ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 

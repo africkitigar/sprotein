@@ -7,8 +7,9 @@
         align-items: center;
         justify-content: space-between;
         padding: 1.6rem;
-        background-color: lighten($green, 30%);
+        background-color: lighten($green, 30%)!important;
         outline: none!important;
+
 
         a.button {
             border:none;
@@ -121,6 +122,10 @@
     }
 
     .woocommerce-tabs {
+
+        ol {
+            padding-left: 1.6rem;
+        }
 
         p:has(+ :is(h1,h2,h3,h4,h5,h6)) {
             margin-bottom: 3.2rem;
@@ -665,6 +670,15 @@ header ul:not([class]),
         img {
             border-radius: 1.6rem;
         }
+
+        .special-header-price {
+            margin-bottom: 2.4rem;
+
+            .price-new {
+                font-weight: 700;
+                font-size: 2.3rem;
+            }
+        }
     }
 
     .special-product-grid {
@@ -707,4 +721,36 @@ header ul:not([class]),
             }
         }
     }
+}
+
+
+
+.woocommerce-message {
+        margin-bottom: 2.4rem;
+        border-radius: 2.4rem;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.6rem;
+        background-color: lighten($green, 30%);
+        outline: none!important;
+
+
+        a.button {
+            border:none;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: $alt-font;
+            font-size: 1.4rem!important;
+            border-radius: 1.6rem;
+            padding: .8rem 1.6rem;
+            cursor: pointer;
+            transition: all .33s ease-in-out;
+
+            &:hover {
+                background-color: darken($accent-color, 10%)!important;
+            }
+        }
 }

@@ -109,7 +109,7 @@
 			//create sticky nav
 			$(window).scroll(function() {
 
-				if ($(this).scrollTop() > 50){  
+				if ($(this).scrollTop() > 60){  
 					$('.header-bottom').addClass("sticky");
 					$('#theme-toggle').addClass('hide');
 				}
