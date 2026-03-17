@@ -117,12 +117,63 @@ function add_custom_acf_product_tabs($tabs)
     return $tabs;
 }
 
-function render_sastav_tab_content()
-{
+function render_sastav_tab_content() {
     global $product;
+
+    $product_id = $product->get_id();
+    $image_id   = get_field('deklaracija_slika', $product_id);
+
     echo '<div class="woocommerce-Tabs-panel--sastav">';
     echo '<h5>Sastav</h5>';
-    the_field('sastav', $product->get_id());
+
+    // tekst
+    if (get_field('sastav', $product_id)) {
+        echo '<div class="sastav-text">';
+        the_field('sastav', $product_id);
+        echo '</div>';
+    }
+
+    // slika (ako postoji)
+    if ($image_id) {
+        $image_full = wp_get_attachment_image_src($image_id, 'full');
+        $image_thumb = wp_get_attachment_image($image_id, 'medium');
+
+        echo '<div class="deklaracija-slika">';
+        echo '<a href="' . esc_url($image_full[0]) . '" class="deklaracija-link">';
+        echo $image_thumb;
+        echo '</a>';
+        echo '</div>';
+        ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                document.querySelectorAll('.deklaracija-link').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+
+                        const src = this.getAttribute('href');
+
+                        const overlay = document.createElement('div');
+                        overlay.className = 'img-overlay';
+
+                        overlay.innerHTML = `
+                            <span class="close">&times;</span>
+                            <img src="${src}" alt="">
+                        `;
+
+                        document.body.appendChild(overlay);
+
+                        overlay.addEventListener('click', function () {
+                            overlay.remove();
+                        });
+                    });
+                });
+
+            });
+        </script>
+        <?php
+    }
+
     echo '</div>';
 }
 
