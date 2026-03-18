@@ -172,6 +172,11 @@
                 font-weight: 500;
                 font-family: $alt-font;
 
+                bdi {
+                    display: flex;
+                    justify-content: flex-end;
+                }
+
                 label {
                     font-weight: 500;
                     font-family: $alt-font;

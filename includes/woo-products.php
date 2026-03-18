@@ -800,7 +800,7 @@ add_filter('woocommerce_related_products', function($related_ids, $product_id, $
 
     $query = new WP_Query([
         'post_type' => 'product',
-        'posts_per_page' => 4,
+        'posts_per_page' => -1,
         'post__not_in' => [$product_id],
         'tax_query' => [
             [

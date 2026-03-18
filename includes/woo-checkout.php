@@ -257,3 +257,8 @@ add_action('woocommerce_review_order_after_order_total', function() {
           </tr>';
 
 });
+
+
+add_filter('woocommerce_shipping_package_name', function ($name, $i, $package) {
+    return 'Dostava';
+}, 10, 3);
