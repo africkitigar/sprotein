@@ -508,6 +508,7 @@
             grid-template-columns: 1fr!important;
 
             .select-group {
+                max-width: calc(100vw - 48px);
                 select {
                     width: 100%;
                 }
@@ -517,6 +518,7 @@
                 gap: 1.6rem!important;
                 display: flex!important;
                 max-width: 100%;
+                max-width: calc(100vw - 48px);
 
                 h4 {
                     font-size: 1.4rem!important;
@@ -524,7 +526,8 @@
 
                 .bundle-slot {
                     max-width: 100%;
-                    min-height: 15rem!important;
+                    min-height: 10rem!important;
+                    flex: 1;
                 }
 
                 img {

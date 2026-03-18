@@ -80,7 +80,10 @@ jQuery(function($){
 
 
 
-
+/**
+ * Summary of sp_get_protein_promo_message
+ * Show different messages in top header
+ */
 function sp_get_protein_promo_message() {
 
   if (!WC()->cart) {
@@ -169,3 +172,138 @@ function sp_get_protein_promo_message() {
 
   return $messages[array_rand($messages)];
 }
+
+
+
+
+
+
+/*
+add_action('woocommerce_before_calculate_totals', function ($cart) {
+
+    if (is_admin() && !defined('DOING_AJAX')) return;
+
+    $target_tags = [30, 31, 75];
+
+    $eligible_items = [];
+    $total_qty = 0;
+
+    // 1. Pronađi sve proizvode u akciji
+    foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
+
+        $product_id = $cart_item['product_id'];
+
+        if (has_term($target_tags, 'product_tag', $product_id)) {
+            $eligible_items[$cart_item_key] = $cart_item;
+            $total_qty += $cart_item['quantity'];
+        }
+    }
+
+    if ($total_qty < 3) return;
+
+    // 2. Koliko komada dobija popust (3,6,9...)
+    $discounted_qty = floor($total_qty / 3) * 3;
+
+    $processed = 0;
+
+    // 3. Resetuj cene prvo (bitno!)
+    foreach ($cart->get_cart() as $cart_item) {
+        $product = $cart_item['data'];
+        $product->set_price($product->get_regular_price() ?: $product->get_price());
+    }
+
+    // 4. Primeni popust samo na prvih N komada
+    foreach ($eligible_items as $cart_item_key => $cart_item) {
+
+        if ($processed >= $discounted_qty) break;
+
+        $product = $cart_item['data'];
+        $qty = $cart_item['quantity'];
+
+        $remaining = $discounted_qty - $processed;
+        $apply_qty = min($qty, $remaining);
+
+        $price = (float) $product->get_price();
+
+        $discounted_price = $price * 0.6667;
+
+        // ako je ceo item u akciji
+        if ($apply_qty === $qty) {
+            $product->set_price($discounted_price);
+        } else {
+            // ako je deo → izračunaj prosečnu cenu (hack bez splitovanja)
+            $full_qty = $qty - $apply_qty;
+
+            $total =
+                ($apply_qty * $discounted_price) +
+                ($full_qty * $price);
+
+            $avg_price = $total / $qty;
+
+            $product->set_price($avg_price);
+        }
+
+        $processed += $apply_qty;
+    }
+
+}, 20);
+*/
+
+/**
+ * Handle 2+1 discount in cart
+ */
+add_action('woocommerce_cart_calculate_fees', function ($cart) {
+
+    if (is_admin() && !defined('DOING_AJAX')) return;
+
+    $target_tags = [30, 31, 75];
+
+    $total_qty = 0;
+    $eligible_items = [];
+
+    // 1. Pronađi proizvode
+    foreach ($cart->get_cart() as $cart_item) {
+
+        $product_id = $cart_item['product_id'];
+
+        if (has_term($target_tags, 'product_tag', $product_id)) {
+            $eligible_items[] = $cart_item;
+            $total_qty += $cart_item['quantity'];
+        }
+    }
+
+    if ($total_qty < 3) return;
+
+    // 2. Koliko komada ulazi u akciju
+    $discounted_qty = floor($total_qty / 3) * 3;
+
+    $processed = 0;
+    $total_savings = 0;
+
+    // 3. Izračunaj uštedu
+    foreach ($eligible_items as $cart_item) {
+
+        if ($processed >= $discounted_qty) break;
+
+        $product = $cart_item['data'];
+        $qty = $cart_item['quantity'];
+
+        $remaining = $discounted_qty - $processed;
+        $apply_qty = min($qty, $remaining);
+
+        $price = (float) $product->get_price();
+
+        // 33.33% ušteda
+        $saving_per_item = $price * 0.3333;
+
+        $total_savings += $saving_per_item * $apply_qty;
+
+        $processed += $apply_qty;
+    }
+
+    if ($total_savings > 0) {
+       $sets = floor($total_qty / 3);
+      $cart->add_fee("Popust (2+1 akcija)", -$total_savings);
+    }
+
+});

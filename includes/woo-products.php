@@ -590,7 +590,7 @@ function sp_get_protein_promo_message() {
 }
 */
 
-
+/*
 add_action('woocommerce_cart_calculate_fees', 'sp_apply_protein_2plus1_discount');
 
 function sp_apply_protein_2plus1_discount(WC_Cart $cart) {
@@ -633,7 +633,7 @@ function sp_apply_protein_2plus1_discount(WC_Cart $cart) {
     false
   );
 }
-
+*/
 
 
 
@@ -739,211 +739,8 @@ function exclude_tag_29_from_cross_sells( $cross_sells ) {
  * Kategorija proteina: proteini
  */
 
-/**
- * 1) Forma na single productu (akcijski proizvod)
- */
-add_action('woocommerce_single_product_summary', 'akcija_21_forma', 25);
-function akcija_21_forma() {
-    global $product;
 
-    if (!$product || $product->get_slug() !== 'akcija-2-1-gratis') return;
-
-    $q = new WP_Query([
-        'post_type' => 'product',
-        'posts_per_page' => 6,
-        'tax_query' => [
-            [
-                'taxonomy' => 'product_cat',
-                'field' => 'slug',
-                'terms' => 'proteini',
-            ]
-        ]
-    ]);
-
-    if (!$q->have_posts()) return;
-
-    $options = [];
-
-    while ($q->have_posts()) {
-        $q->the_post();
-        $options[] = [
-            'id' => get_the_ID(),
-            'title' => get_the_title()
-        ];
-    }
-
-    wp_reset_postdata();
-    ?>
-
-    <div class="akcija-21-wrap">
-        <h3>Akcija 2+1 gratis</h3>
-
-        <div class="akcija-21-form">
-
-            <?php for ($i=1; $i<=3; $i++): ?>
-                <select class="akcija-select">
-                    <option value="">Izaberi ukus (<?php echo $i; ?>)</option>
-                    <?php foreach ($options as $opt): ?>
-                        <option value="<?php echo $opt['id']; ?>">
-                            <?php echo esc_html($opt['title']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            <?php endfor; ?>
-
-            <button type="button" class="button alt akcija-dodaj">
-                Dodaj u korpu
-            </button>
-
-        </div>
-    </div>
-
-    <?php
-}
-
-
-
-
-
-
-
-
-
-
-add_action('wp_footer', function() {
-
-    if (!is_product()) return;
-
-    ?>
-
-<script>
-jQuery(function($){
-
-    $('.akcija-dodaj').on('click', function(){
-
-        let ids = [];
-        let valid = true;
-
-        $('.akcija-select').each(function(){
-            let val = $(this).val();
-            if(!val){
-                valid = false;
-            } else {
-                ids.push(val);
-            }
-        });
-
-        if(!valid || ids.length !== 3){
-            alert('Morate izabrati 3 proizvoda.');
-            return;
-        }
-
-        let i = 0;
-
-        /*function addNext() {
-
-            if (i >= ids.length) {
-
-                $(document.body).trigger('wc_fragment_refresh');
-                $(document.body).trigger('added_to_cart');
-
-                // ukloni stari notice ako postoji
-                $('.akcija-success').remove();
-
-                // ubaci novi notice ispod breadcrumb-a
-                $('.woocommerce-breadcrumb').after(
-                    '<div class="akcija-success" style="background:#d4edda;color:#155724;padding:12px 16px;margin:15px 0;border-radius:4px;">' +
-                    '✔ Uspešno ste dodali 3 proizvoda u korpu.' +
-                    '</div>'
-                );
-
-                return;
-            }
-
-
-            $.ajax({
-                type: 'POST',
-                url: wc_add_to_cart_params.wc_ajax_url
-                        .replace('%%endpoint%%', 'add_to_cart'),
-                data: {
-                    product_id: ids[i],
-                    quantity: 1
-                },
-                success: function() {
-                    i++;
-                    addNext(); // pozovi sledeći
-                }
-            });
-
-        }
-*/
-        function addNext() {
-
-    if (i >= ids.length) {
-        return;
-    }
-
-    $.ajax({
-        type: 'POST',
-        url: wc_add_to_cart_params.wc_ajax_url
-                .replace('%%endpoint%%', 'add_to_cart'),
-        data: {
-            product_id: ids[i],
-            quantity: 1
-        },
-        success: function(response) {
-
-            if (response.fragments) {
-                $.each(response.fragments, function(key, value) {
-                    $(key).replaceWith(value);
-                });
-            }
-
-            i++;
-            addNext();
-        }
-    });
-}
-
-
-        addNext();
-
-    });
-
-});
-</script>
-
-<?php
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
 add_action( 'woocommerce_before_calculate_totals', function( $cart ) {
 
     foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
@@ -953,7 +750,7 @@ add_action( 'woocommerce_before_calculate_totals', function( $cart ) {
         }
     }
 
-});
+});*/
 
 
 
