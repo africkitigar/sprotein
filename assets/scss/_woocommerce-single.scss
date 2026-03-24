@@ -447,7 +447,22 @@
 
 
 
+.product-description-wrapper {
+    background-color: $lightgray-color;
+    border-bottom-left-radius: 3.2rem;
+    border-bottom-right-radius: 3.2rem;
+    padding: 2.4rem;
 
+    .product-description-content {
+        max-width: $container;
+        margin: 0 auto;
+        font-size: 1.4rem;
+
+        > * {
+            max-width: 84rem;
+        }
+    }
+}
 
 
 

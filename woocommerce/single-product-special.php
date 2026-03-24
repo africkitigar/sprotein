@@ -8,6 +8,9 @@ global $product;
 $product_id = get_the_ID();
 $action_tag = get_field('action_tag', $product_id);
 
+$product_object = wc_get_product( $product_id );
+$description = $product_object->get_description();
+
 $price = 0;
 
 // nađi jedan proizvod iz tog taga
@@ -187,6 +190,20 @@ $savings = $old_total - $new_total;
     </div>
 
 </div>
+
+
+<?php 
+if ( ! empty( $description ) ) :
+    ?>
+            <div class="product-description-wrapper">
+                <div class="product-description-content">
+                    <?php echo apply_filters( 'the_content', $description ); ?>
+                </div>
+            </div>
+    <?php
+        endif;
+?>
+
 
 
 <script>
