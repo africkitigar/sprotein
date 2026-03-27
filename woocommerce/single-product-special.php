@@ -33,6 +33,8 @@ if (!empty($products)) {
 $old_total = $price * 3;
 $new_total = $price * 2;
 $savings = $old_total - $new_total;
+
+$tag = get_term($action_tag, 'product_tag');
 ?>
 
 <div class="container special-product-layout">
@@ -40,10 +42,11 @@ $savings = $old_total - $new_total;
     <?php woocommerce_breadcrumb(); ?>
 
     <div class="special-header">
-        <h1><?php echo get_the_title(); ?></h1>
+        <h1><?php //echo get_the_title();
+        echo $tag->name; ?></h1>
         <h2 class="tag-subtitle"><b>Akcija 2+1 gratis</b></h2>
         <?php
-        $tag = get_term($action_tag, 'product_tag');
+        
 
         if (!is_wp_error($tag) && $tag !== null) {
             ?>
