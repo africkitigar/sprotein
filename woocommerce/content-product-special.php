@@ -36,7 +36,7 @@ $image_url   = get_the_post_thumbnail_url( $product_id, 'large' );
                 <?php endif; ?>
 
                 <span class="special-banner-cta btn">
-                    <?php _e( 'Saznaj više', 'woocommerce' ); ?>
+                    <?php _e( 'Iskoristi akciju', 'woocommerce' ); ?>
                 </span>
 
             </div>

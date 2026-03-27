@@ -41,12 +41,13 @@ $savings = $old_total - $new_total;
 
     <div class="special-header">
         <h1><?php echo get_the_title(); ?></h1>
+        <h2 class="tag-subtitle"><b>Akcija 2+1 gratis</b></h2>
         <?php
         $tag = get_term($action_tag, 'product_tag');
 
         if (!is_wp_error($tag) && $tag !== null) {
             ?>
-            <h2 class="tag-subtitle"><b><?php echo $tag->name; ?></b> - izaberi svoju kombinaciju i uštedi <?php echo wc_price($savings); ?></h2>
+            <h2 class="tag-subtitle">Izaberi svoju kombinaciju i uštedi <b><?php echo wc_price($savings); ?></b></h2>
         <?php }//has tag ?>
 
         <div class="special-header-price">

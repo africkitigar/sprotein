@@ -56,7 +56,19 @@ add_filter('use_block_editor_for_post_type', 'enable_gutenberg_for_products', 10
 
 
 
+/**
+ * Change main description tab label to Više
+ */
+add_filter('woocommerce_product_tabs', 'rename_description_tab', 98);
 
+function rename_description_tab($tabs) {
+
+    if (isset($tabs['description'])) {
+        $tabs['description']['title'] = 'Više';
+    }
+
+    return $tabs;
+}
 
 
 /**
@@ -87,13 +99,13 @@ function add_custom_acf_product_tabs($tabs)
 
     /**
      * DESCRIPTION PRIORITY IS 10
-     * So we add ours at 15 and 16
+     * 
      */
 
     if (!empty($sastav)) {
         $tabs['sastav_tab'] = array(
             'title' => __('Sastav', 'woocommerce'),
-            'priority' => 15,
+            'priority' => 2,
             'callback' => 'render_sastav_tab_content'
         );
     }
@@ -101,7 +113,7 @@ function add_custom_acf_product_tabs($tabs)
     if (!empty($nacin_pripreme)) {
         $tabs['nacin_pripreme_tab'] = array(
             'title' => __('Priprema', 'woocommerce'),
-            'priority' => 16,
+            'priority' => 3,
             'callback' => 'render_nacin_pripreme_tab_content'
         );
     }
@@ -109,7 +121,7 @@ function add_custom_acf_product_tabs($tabs)
     if (!empty($nacin_pripreme)) {
         $tabs['deklaracija_tab'] = array(
             'title' => __('Deklaracija', 'woocommerce'),
-            'priority' => 17,
+            'priority' => 1,
             'callback' => 'render_deklaracija_tab_content'
         );
     }
@@ -381,7 +393,6 @@ function custom_category_based_upsells() {
   wp_reset_postdata();
 }
 /** end of | Custom upsell products on single product **/
-
 
 
 
