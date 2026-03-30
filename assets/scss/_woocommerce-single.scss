@@ -819,3 +819,20 @@ header ul:not([class]),
     color: #fff;
     cursor: pointer;
 }
+
+
+.term-23 {
+    .listed-products {
+        .columns-4 {
+            .product-special-banner {
+                    grid-column: 1 / -1;
+                
+                .special-banner-inner {
+                    background-size: cover!important;
+                    background-position: center;
+                    aspect-ratio: 3 / 1;
+                }
+            }
+        }
+    }
+}
