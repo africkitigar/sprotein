@@ -2,7 +2,8 @@
 /***
  * Custom Post fee on checkout 
  */
-add_action( 'woocommerce_cart_calculate_fees', 'add_cod_fee', 20, 1 );
+
+add_action( 'woocommerce_cart_calculate_fees', 'add_cod_fee', 30, 1 );
 function add_cod_fee( $cart ) {
 
     if ( is_admin() && ! defined( 'DOING_AJAX' ) )
@@ -11,19 +12,72 @@ function add_cod_fee( $cart ) {
     if ( ! is_checkout() )
         return;
 
-    // Get chosen payment method
     $chosen_payment_method = WC()->session->get( 'chosen_payment_method' );
 
-    if ( $chosen_payment_method === 'cod' ) {
+    if ( $chosen_payment_method !== 'cod' ) return;
 
-        $fee = 50; // amount
+    $percentage = 0.01;
+    $min_fee    = 50;
 
-        $cart->add_fee(
-            __( 'Naknada pošte za pouzeće', 'woocommerce' ),
-            $fee,
-            false // not taxable
-        );
+    // 🔹 OSNOVA (bez fee-ova)
+    $base_total = 
+        (float) $cart->get_cart_contents_total() + 
+        (float) $cart->get_shipping_total() + 
+        (float) $cart->get_taxes_total();
+
+    // 🔥 RUČNO izračunaj tvoj 2+1 popust opet
+    $target_tags = [30, 31, 75];
+    $total_qty = 0;
+    $eligible_items = [];
+
+    foreach ($cart->get_cart() as $cart_item) {
+        $product_id = $cart_item['product_id'];
+
+        if (has_term($target_tags, 'product_tag', $product_id)) {
+            $eligible_items[] = $cart_item;
+            $total_qty += $cart_item['quantity'];
+        }
     }
+
+    $total_savings = 0;
+
+    if ($total_qty >= 3) {
+
+        $discounted_qty = floor($total_qty / 3) * 3;
+        $processed = 0;
+
+        foreach ($eligible_items as $cart_item) {
+
+            if ($processed >= $discounted_qty) break;
+
+            $product = $cart_item['data'];
+            $qty = $cart_item['quantity'];
+
+            $remaining = $discounted_qty - $processed;
+            $apply_qty = min($qty, $remaining);
+
+            $price = (float) $product->get_price();
+            $saving_per_item = $price * 0.3333;
+
+            $total_savings += $saving_per_item * $apply_qty;
+            $processed += $apply_qty;
+        }
+    }
+
+    // 🔥 FINAL TOTAL (sa popustom)
+    $final_total = $base_total - $total_savings;
+
+    $fee = $final_total * $percentage;
+
+    if ($fee < $min_fee) {
+        $fee = $min_fee;
+    }
+
+    $cart->add_fee(
+        __( 'Naknada pošte za pouzeće', 'woocommerce' ),
+        $fee,
+        false
+    );
 }
 
 add_action( 'wp_footer', function() {
