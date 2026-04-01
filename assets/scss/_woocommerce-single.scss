@@ -1,4 +1,12 @@
 .single-product {
+    .price-old {
+        font-size: 2rem;
+        font-weight: 300;
+
+        &::after {
+            display: none;
+        }
+    }
     .woocommerce-message {
         margin-bottom: 2.4rem;
         border-radius: 2.4rem;
@@ -509,6 +517,9 @@
 }
 
 @media only screen and (max-width:767px) {
+    .special-product-layout.special-combo .special-product-grid .bundle-preview .bundle-slot {
+        max-width: calc(50% - 6px);
+    }
     .special-product-layout {
         .special-header {
             h1 {

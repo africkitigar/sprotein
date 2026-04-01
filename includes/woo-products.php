@@ -655,6 +655,12 @@ function load_custom_single_for_tag_29( $template ) {
             if ( $custom ) {
                 return $custom;
             }
+        } elseif(has_term( 'kombo', 'product_tag', $product_id )) {
+            $custom = locate_template( 'woocommerce/single-combo-product.php' );
+    
+            if ( $custom ) {
+                return $custom;
+            }
         }
     }
 

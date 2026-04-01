@@ -196,17 +196,17 @@ $tag = get_term($action_tag, 'product_tag');
 </div>
 
 
-<?php 
-if ( ! empty( $description ) ) :
-    ?>
-            <div class="product-description-wrapper">
-                <div class="product-description-content">
-                    <?php echo apply_filters( 'the_content', $description ); ?>
-                </div>
-            </div>
-    <?php
-        endif;
-?>
+<div class="product-description-wrapper">
+    <div class="product-description-content">
+        <?php
+        /**
+         * Prikaži WooCommerce tabove
+         */
+        woocommerce_output_product_data_tabs();
+        ?>
+    </div>
+</div>
+
 
 
 

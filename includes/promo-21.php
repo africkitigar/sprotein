@@ -4,6 +4,7 @@
 add_action('wp_ajax_add_bundle_to_cart', 'add_bundle_to_cart');
 add_action('wp_ajax_nopriv_add_bundle_to_cart', 'add_bundle_to_cart');
 
+
 function add_bundle_to_cart() {
 
     $ids = $_POST['products'];
@@ -27,7 +28,7 @@ if (!is_product()) return;
 <script>
 jQuery(function($){
 
-    $('.special-bundle-form').on('submit', function(e){
+    $('.special-bundle-form:not(.combo-form)').on('submit', function(e){
         e.preventDefault();
 
         const products = [
@@ -74,6 +75,29 @@ jQuery(function($){
 
 
 
+
+
+add_action('wp_ajax_add_special_product_to_cart', 'add_special_product_to_cart');
+add_action('wp_ajax_nopriv_add_special_product_to_cart', 'add_special_product_to_cart');
+
+function add_special_product_to_cart() {
+
+    $product_id = intval($_POST['product_id']);
+    $flavor_1   = sanitize_text_field($_POST['flavor_1']);
+    $flavor_2   = sanitize_text_field($_POST['flavor_2']);
+
+    if (!$product_id || !$flavor_1 || !$flavor_2) {
+        wp_send_json_error(['message' => 'Missing data']);
+    }
+
+    WC()->cart->add_to_cart($product_id, 1, 0, [], [
+        'flavor_1' => $flavor_1,
+        'flavor_2' => $flavor_2,
+        'unique_key' => md5(microtime())
+    ]);
+
+    WC_AJAX::get_refreshed_fragments();
+}
 
 
 
@@ -307,3 +331,69 @@ add_action('woocommerce_cart_calculate_fees', function ($cart) {
     }
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+add_filter('woocommerce_add_cart_item_data', function ($cart_item_data, $product_id) {
+
+    if (isset($_POST['flavor_1'])) {
+        $cart_item_data['flavor_1'] = sanitize_text_field($_POST['flavor_1']);
+    }
+
+    if (isset($_POST['flavor_2'])) {
+        $cart_item_data['flavor_2'] = sanitize_text_field($_POST['flavor_2']);
+    }
+
+    // da ne merge-uje iste proizvode
+    $cart_item_data['unique_key'] = md5(microtime());
+
+    return $cart_item_data;
+
+}, 10, 2);
+
+add_filter('woocommerce_get_item_data', function ($item_data, $cart_item) {
+
+    if (!empty($cart_item['flavor_1'])) {
+        $product = wc_get_product($cart_item['flavor_1']);
+        $item_data[] = [
+            'key'   => 'Kombo proizvod 1',
+            'value' => $product ? $product->get_name() : '',
+        ];
+    }
+
+    if (!empty($cart_item['flavor_2'])) {
+        $product = wc_get_product($cart_item['flavor_2']);
+        $item_data[] = [
+            'key'   => 'Kombo proizvod 2',
+            'value' => $product ? $product->get_name() : '',
+        ];
+    }
+
+    return $item_data;
+
+}, 10, 2);
+
+
+add_action('woocommerce_checkout_create_order_line_item', function ($item, $cart_item_key, $values) {
+
+    if (!empty($values['flavor_1'])) {
+        $product = wc_get_product($values['flavor_1']);
+        $item->add_meta_data('Kombo proizvod 1', $product ? $product->get_name() : '');
+    }
+
+    if (!empty($values['flavor_2'])) {
+        $product = wc_get_product($values['flavor_2']);
+        $item->add_meta_data('Kombo proizvod 2', $product ? $product->get_name() : '');
+    }
+
+}, 10, 3);
