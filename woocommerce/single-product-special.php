@@ -189,6 +189,24 @@ $tag = get_term($action_tag, 'product_tag');
 
             </div>
 
+
+
+            <div class="bundle-note">
+                <p>
+                    <strong>Napomena u vezi akcije:</strong><br>
+
+                    Redovna cena jednog proizvoda iznosi <?php echo wc_price($price); ?>.<br>
+
+                    Redovna cena promotivnog paketa (3 komada) iznosi <?php echo wc_price($old_total); ?>.<br>
+
+                    Tokom trajanja akcije paket 2+1 prodaje se po ceni od <?php echo wc_price($new_total); ?>.<br>
+
+                    Na fiskalnom računu cena se raspodeljuje na tri proizvoda:
+                    <?php echo wc_price($new_total); ?> ÷ 3 =
+                    <?php echo wc_price($new_total / 3); ?> po komadu.
+                </p>
+            </div>
+
         </div>
 
     </div>
