@@ -8,7 +8,7 @@ global $product;
 $product_id = get_the_ID();
 $action_tag = get_field('action_tag', $product_id);
 
-$product_object = wc_get_product( $product_id );
+$product_object = wc_get_product($product_id);
 $description = $product_object->get_description();
 
 $price = 0;
@@ -46,7 +46,7 @@ $tag = get_term($action_tag, 'product_tag');
         echo $tag->name; ?></h1>
         <h2 class="tag-subtitle"><b>Akcija 2+1 gratis</b></h2>
         <?php
-        
+
 
         if (!is_wp_error($tag) && $tag !== null) {
             ?>
@@ -192,19 +192,36 @@ $tag = get_term($action_tag, 'product_tag');
 
 
             <div class="bundle-note">
-                <p>
-                    <strong>Napomena u vezi akcije:</strong><br>
 
-                    Redovna cena jednog proizvoda iznosi <?php echo wc_price($price); ?>.<br>
+                <button class="bundle-note-toggle" type="button">
+                    <span class="note-icon">
+                        <!-- info icon -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                            <line x1="12" y1="10" x2="12" y2="16" stroke="currentColor" stroke-width="2" />
+                            <circle cx="12" cy="7" r="1.5" fill="currentColor" />
+                        </svg>
+                    </span>
 
-                    Redovna cena promotivnog paketa (3 komada) iznosi <?php echo wc_price($old_total); ?>.<br>
+                    <span class="note-text">Napomena u vezi akcije</span>
 
-                    Tokom trajanja akcije paket 2+1 prodaje se po ceni od <?php echo wc_price($new_total); ?>.<br>
+                    <span class="note-arrow">+</span>
+                </button>
 
-                    Na fiskalnom računu cena se raspodeljuje na tri proizvoda:
-                    <?php echo wc_price($new_total); ?> ÷ 3 =
-                    <?php echo wc_price($new_total / 3); ?> po komadu.
-                </p>
+                <div class="bundle-note-content">
+                    <p>
+                        Redovna cena jednog proizvoda iznosi <?php echo wc_price($price); ?>.<br>
+
+                        Redovna cena promotivnog paketa (3 komada) iznosi <?php echo wc_price($old_total); ?>.<br>
+
+                        Tokom trajanja akcije paket 2+1 prodaje se po ceni od <?php echo wc_price($new_total); ?>.<br>
+
+                        Na fiskalnom računu cena se raspodeljuje na tri proizvoda:
+                        <?php echo wc_price($new_total); ?> ÷ 3 =
+                        <?php echo wc_price(round($new_total / 3, 2)); ?> po komadu.
+                    </p>
+                </div>
+
             </div>
 
         </div>
@@ -229,6 +246,14 @@ $tag = get_term($action_tag, 'product_tag');
 
 
 <script>
+    document.querySelectorAll('.bundle-note-toggle').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const wrapper = this.closest('.bundle-note');
+            wrapper.classList.toggle('active');
+        });
+    });
+
+
     document.addEventListener('DOMContentLoaded', function () {
 
         function updateSlot(select, slotNumber) {

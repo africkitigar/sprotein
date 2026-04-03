@@ -141,3 +141,137 @@ function custom_cart_crossells() {
 
     wp_reset_postdata();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+add_action('woocommerce_before_calculate_totals', function ($cart) {
+
+    if (is_admin() && !defined('DOING_AJAX')) return;
+
+    $target_product_id = 619;
+    $threshold = 5000;
+    $special_price = 199;
+
+    $cart_total = 0;
+
+    // 1. Izračunaj total BEZ tog proizvoda
+    foreach ($cart->get_cart() as $cart_item) {
+
+        if ($cart_item['product_id'] == $target_product_id) continue;
+
+        $cart_total += $cart_item['line_total'];
+    }
+
+    // 2. Ako je >= 5000 → promeni cenu
+    if ($cart_total >= $threshold) {
+
+        foreach ($cart->get_cart() as $cart_item) {
+
+            if ($cart_item['product_id'] == $target_product_id) {
+
+                $cart_item['data']->set_price($special_price);
+            }
+        }
+
+    } else {
+
+        // 3. Vrati normalnu cenu ako padne ispod 5000
+        foreach ($cart->get_cart() as $cart_item) {
+
+            if ($cart_item['product_id'] == $target_product_id) {
+
+                $product = wc_get_product($target_product_id);
+                $cart_item['data']->set_price($product->get_regular_price());
+            }
+        }
+    }
+
+}, 20);
+
+
+
+
+add_action('woocommerce_after_cart', function () {
+
+    $target_product_id = 619;
+    $threshold = 5000;
+
+    $cart_total = WC()->cart->get_subtotal();
+
+    $product = wc_get_product($target_product_id);
+    if (!$product) return;
+
+    $in_cart = false;
+
+    foreach (WC()->cart->get_cart() as $item) {
+        if ($item['product_id'] == $target_product_id) {
+            $in_cart = true;
+            break;
+        }
+    }
+
+    if ($in_cart || $cart_total < $threshold) return;
+
+    ?>
+    
+    <div class="custom-cart-upsell">
+
+        <?php if ($cart_total >= $threshold): ?>
+            <h3>🎉 Specijalna ponuda otključana!</h3>
+            <p>Dodaj ovaj proizvod za samo <strong>199 RSD</strong></p>
+       
+        <?php endif; ?>
+
+        <div class="upsell-product">
+
+            <div class="upsell-image">
+                <?php echo $product->get_image('medium'); ?>
+            </div>
+
+            <div class="upsell-info">
+                <h4><?php echo $product->get_name(); ?></h4>
+
+                <?php if ($product->get_short_description()): ?>
+                    <div class="upsell-short-desc">
+                        <?php echo wp_kses_post($product->get_short_description()); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($cart_total >= $threshold): ?>
+                    <div class="price">
+                        <del><?php echo wc_price($product->get_regular_price()); ?></del>
+                        <strong><?php echo wc_price(199); ?></strong>
+                    </div>
+                <?php else: ?>
+                    <div class="price">
+                        <?php echo wc_price($product->get_price()); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!$in_cart): ?>
+                    <a href="<?php echo esc_url( add_query_arg('add-to-cart', $target_product_id, wc_get_cart_url()) ); ?>" 
+                    class="button">
+                        Dodaj u korpu
+                    </a>
+                <?php endif; ?>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <?php
+}, 3);

@@ -288,6 +288,15 @@
 }
 
 @media only screen and (max-width:767px) {
+    .custom-cart-upsell {
+        .upsell-product {
+            flex-direction: column;
+
+            h4 {
+                font-size: 1.8rem;
+            }
+        }
+    }
     .faq-wrapper {
         .wp-block-accordion-item {
             font-size: 1.4rem!important;
@@ -349,5 +358,33 @@ dl.variation {
     dt {
         font-size: 1.2rem;
         opacity: .7;
+    }
+}
+
+
+.custom-cart-upsell {
+    grid-column: 1 / -1;
+    background-color: $lightgray-color;
+    border-radius: 2.4rem;
+    padding: 2.4rem;
+
+    .upsell-product {
+        display: flex;
+        gap: 2.4rem;
+
+        img {
+            border-radius: 1.6rem;
+            max-width: 20rem;
+        }
+
+        .upsell-short-desc {
+            font-size: 1.4rem;
+        }
+
+        a.button {
+            display: inline-flex;
+            max-width: 23rem;
+            margin-top: 1.6rem;
+        }
     }
 }
