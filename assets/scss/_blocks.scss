@@ -507,6 +507,26 @@ p.featured {
         margin: 0 auto;
     }
 }
+
+
+.logos {
+    padding-bottom: 0!important;
+
+    .wp-block-gallery {
+        display: flex;
+        gap: 4.8rem!important;
+        align-items: center;
+        justify-content: center;
+        margin-top: 2.4rem;
+        flex-wrap: nowrap;
+
+        .wp-block-image {
+            width: auto!important;
+            flex-grow: initial!important;
+        }
+    }
+}
+
     
 
 /*
@@ -567,6 +587,9 @@ p.featured {
     }
     .gallery-block .wp-block-columns {
         gap: 0!important;
+    }
+    .logos .wp-block-gallery {
+        gap: 1rem!important;
     }
 }
 @media only screen and (max-width:767px) {
