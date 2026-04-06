@@ -40,6 +40,19 @@ $tag = get_term($action_tag, 'product_tag');
 
 $attachment_ids = $product->get_gallery_image_ids();
 $featured_id = $product->get_image_id();
+
+// spoji sve slike u jedan niz
+$images = [];
+
+if ($featured_id) {
+    $images[] = $featured_id;
+}
+
+if (!empty($attachment_ids)) {
+    $images = array_merge($images, $attachment_ids);
+}
+
+$image_count = count($images);
 ?>
 
 <div class="container special-product-layout">
@@ -70,26 +83,29 @@ $featured_id = $product->get_image_id();
 
         </div>
 
-        <div class="swiper product-gallery">
-            <div class="swiper-wrapper">
+        <?php if ($image_count > 1): ?>
 
-                <?php if ($featured_id): ?>
-                    <div class="swiper-slide">
-                        <?php echo wp_get_attachment_image($featured_id, 'large'); ?>
-                    </div>
-                <?php endif; ?>
+            <div class="swiper product-gallery">
+                <div class="swiper-wrapper">
 
-                <?php foreach ($attachment_ids as $attachment_id): ?>
-                    <div class="swiper-slide">
-                        <?php echo wp_get_attachment_image($attachment_id, 'large'); ?>
-                    </div>
-                <?php endforeach; ?>
+                    <?php foreach ($images as $img_id): ?>
+                        <div class="swiper-slide">
+                            <?php echo wp_get_attachment_image($img_id, 'large'); ?>
+                        </div>
+                    <?php endforeach; ?>
 
+                </div>
+
+                <div class="swiper-pagination"></div>
             </div>
 
-            <!-- pagination -->
-            <div class="swiper-pagination"></div>
-        </div>
+        <?php else: ?>
+
+            <div class="product-single-image">
+                <?php echo wp_get_attachment_image($images[0], 'large'); ?>
+            </div>
+
+        <?php endif; ?>
 
 
     </div>
