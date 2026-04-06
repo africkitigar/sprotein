@@ -35,6 +35,11 @@ $new_total = $price * 2;
 $savings = $old_total - $new_total;
 
 $tag = get_term($action_tag, 'product_tag');
+
+
+
+$attachment_ids = $product->get_gallery_image_ids();
+$featured_id = $product->get_image_id();
 ?>
 
 <div class="container special-product-layout">
@@ -65,10 +70,28 @@ $tag = get_term($action_tag, 'product_tag');
 
         </div>
 
-        <?php
-        if (has_post_thumbnail($product_id)) {
-            echo get_the_post_thumbnail($product_id, 'large');
-        } ?>
+        <div class="swiper product-gallery">
+            <div class="swiper-wrapper">
+
+                <?php if ($featured_id): ?>
+                    <div class="swiper-slide">
+                        <?php echo wp_get_attachment_image($featured_id, 'large'); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php foreach ($attachment_ids as $attachment_id): ?>
+                    <div class="swiper-slide">
+                        <?php echo wp_get_attachment_image($attachment_id, 'large'); ?>
+                    </div>
+                <?php endforeach; ?>
+
+            </div>
+
+            <!-- pagination -->
+            <div class="swiper-pagination"></div>
+        </div>
+
+
     </div>
 
     <div class="special-product-grid">
@@ -246,6 +269,24 @@ $tag = get_term($action_tag, 'product_tag');
 
 
 <script>
+
+    new Swiper('.product-gallery', {
+        loop: false,
+        spaceBetween: 10,
+
+   /* autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+    },*/
+
+        pagination: {
+            el: '.swiper-pagination',
+            type: 'progressbar', 
+        },
+    });
+
+
+
     document.querySelectorAll('.bundle-note-toggle').forEach(btn => {
         btn.addEventListener('click', function () {
             const wrapper = this.closest('.bundle-note');

@@ -745,6 +745,42 @@ header ul:not([class]),
         background-position: center!important;
     }
 
+    .product-gallery {
+        padding-bottom: 3.6rem;
+        .swiper-slide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: auto;
+        }
+
+        img {
+            max-height: 60rem;
+            min-height: 33rem;
+            object-fit: cover;
+            cursor: grab;
+        }
+
+        .swiper-pagination {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: .6rem;
+
+            .swiper-pagination-progressbar-fill {
+                background-color: $accent-color;
+            }
+
+            .swiper-pagination-bullet {
+                width: 1rem;
+                height: .6rem;
+                background-color: $lightgray-color;
+                cursor: pointer;
+            }
+        }
+    }
+
     .special-header {
         text-align: center;
         margin-bottom: 3.2rem;
