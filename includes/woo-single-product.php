@@ -112,7 +112,7 @@ function add_custom_acf_product_tabs($tabs)
 
     if (!empty($nacin_pripreme)) {
         $tabs['nacin_pripreme_tab'] = array(
-            'title' => __('Priprema', 'woocommerce'),
+            'title' => __('Upotreba', 'woocommerce'),
             'priority' => 3,
             'callback' => 'render_nacin_pripreme_tab_content'
         );
@@ -193,7 +193,7 @@ function render_nacin_pripreme_tab_content()
 {
     global $product;
     echo '<div class="woocommerce-Tabs-panel--nacin-pripreme">';
-    echo '<h5>Priprema</h5>';
+    echo '<h5>Upotreba</h5>';
     the_field('nacin_pripreme', $product->get_id());
     echo '</div>';
 }
