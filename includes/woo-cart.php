@@ -23,6 +23,7 @@ function custom_cart_crossells() {
     $has_16_17 = false;
     $has_22 = false;
     $has_24 = false;
+    $has_25 = false;
 
     // Provera proizvoda u korpi
     foreach (WC()->cart->get_cart() as $cart_item) {
@@ -38,6 +39,10 @@ function custom_cart_crossells() {
 
         if (has_term(24, 'product_cat', $product_id)) {
             $has_24 = true;
+        }
+
+        if (has_term(25, 'product_cat', $product_id)) {
+            $has_25 = true;
         }
     }
 
@@ -108,6 +113,15 @@ function custom_cart_crossells() {
                 'operator' => 'NOT IN',
             ];
 
+        } elseif ($has_25) {
+
+            $tax_query[] = [
+                'taxonomy' => 'product_cat',
+                'field'    => 'term_id',
+                'terms'    => [22,23,24],
+                'operator' => 'NOT IN',
+            ];
+
         } else {
             return;
         }
@@ -128,7 +142,7 @@ function custom_cart_crossells() {
     }
 
     echo '<section class="custom-cart-crossells">';
-    echo '<h3>Možda će vam se svideti</h3>';
+    echo '<h3>Naša preporuka</h3>';
     echo '<ul class="products columns-4">';
 
     while ($query->have_posts()) {

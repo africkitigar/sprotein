@@ -56,6 +56,23 @@ if ($sale_price) {
     $price_html = '
         <span class="price-new">' . wc_price($regular_price) . '</span>';
 }
+
+
+$attachment_ids = $product->get_gallery_image_ids();
+$featured_id = $product->get_image_id();
+
+// spoji sve slike u jedan niz
+$images = [];
+
+if ($featured_id) {
+    $images[] = $featured_id;
+}
+
+if (!empty($attachment_ids)) {
+    $images = array_merge($images, $attachment_ids);
+}
+
+$image_count = count($images);
 ?>
 
 <div class="container special-product-layout special-combo">
@@ -72,11 +89,29 @@ if ($sale_price) {
             </span>
         </div>
 
-        <?php
-        if (has_post_thumbnail($product_id)) {
-            echo get_the_post_thumbnail($product_id, 'large');
-        }
-        ?>
+        <?php if ($image_count > 1): ?>
+
+            <div class="swiper product-gallery">
+                <div class="swiper-wrapper">
+
+                    <?php foreach ($images as $img_id): ?>
+                        <div class="swiper-slide">
+                            <?php echo wp_get_attachment_image($img_id, 'large'); ?>
+                        </div>
+                    <?php endforeach; ?>
+
+                </div>
+
+                <div class="swiper-pagination"></div>
+            </div>
+
+        <?php else: ?>
+
+            <div class="product-single-image">
+                <?php echo wp_get_attachment_image($images[0], 'large'); ?>
+            </div>
+
+        <?php endif; ?>
     </div>
 
     <div class="special-product-grid">
@@ -156,6 +191,44 @@ if ($sale_price) {
 
             </div>
 
+
+                        <div class="bundle-note">
+
+                <button class="bundle-note-toggle" type="button">
+                    <span class="note-icon">
+                        <!-- info icon -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                            <line x1="12" y1="10" x2="12" y2="16" stroke="currentColor" stroke-width="2" />
+                            <circle cx="12" cy="7" r="1.5" fill="currentColor" />
+                        </svg>
+                    </span>
+
+                    <span class="note-text">Napomena u vezi akcije</span>
+
+                    <span class="note-arrow">+</span>
+                </button>
+
+                <div class="bundle-note-content">
+                    <p>
+                        <?php
+
+                        $start = date_i18n('d. m.', strtotime('first day of this month'));
+                        $end = date_i18n('d. m. Y.', strtotime('last day of this month'));
+                        ?>
+                    <div class="delivery-item sale-validity">
+                        <span><?php echo 'Ova akcija važi od ' . esc_html($start) . ' do ' . esc_html($end); ?></span>
+                    </div>
+
+                    Redovna cena jednog proizvoda iznosi <?php echo wc_price($regular_price); ?>.<br>
+
+                    Tokom trajanja akcije kombo paket prodaje se po ceni od <?php echo wc_price($sale_price); ?>.<br>
+
+                    </p>
+                </div>
+
+            </div>
+
         </div>
 
     </div>
@@ -170,6 +243,29 @@ if ($sale_price) {
 </div>
 
 <script>
+    new Swiper('.product-gallery', {
+        loop: false,
+        spaceBetween: 10,
+
+        /* autoplay: {
+             delay: 3000,
+             disableOnInteraction: false,
+         },*/
+
+        pagination: {
+            el: '.swiper-pagination',
+            type: 'progressbar',
+        },
+    });
+
+
+
+    document.querySelectorAll('.bundle-note-toggle').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const wrapper = this.closest('.bundle-note');
+            wrapper.classList.toggle('active');
+        });
+    });    
 document.addEventListener('DOMContentLoaded', function () {
 
     function updateSlot(select, slotNumber) {

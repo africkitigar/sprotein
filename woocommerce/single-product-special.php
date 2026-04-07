@@ -249,15 +249,24 @@ $image_count = count($images);
 
                 <div class="bundle-note-content">
                     <p>
-                        Redovna cena jednog proizvoda iznosi <?php echo wc_price($price); ?>.<br>
+                        <?php
 
-                        Redovna cena promotivnog paketa (3 komada) iznosi <?php echo wc_price($old_total); ?>.<br>
+                        $start = date_i18n('d. m.', strtotime('first day of this month'));
+                        $end = date_i18n('d. m. Y.', strtotime('last day of this month'));
+                        ?>
+                    <div class="delivery-item sale-validity">
+                        <span><?php echo 'Ova akcija važi od ' . esc_html($start) . ' do ' . esc_html($end); ?></span>
+                    </div>
 
-                        Tokom trajanja akcije paket 2+1 prodaje se po ceni od <?php echo wc_price($new_total); ?>.<br>
+                    Redovna cena jednog proizvoda iznosi <?php echo wc_price($price); ?>.<br>
 
-                        Na fiskalnom računu cena se raspodeljuje na tri proizvoda:
-                        <?php echo wc_price($new_total); ?> ÷ 3 =
-                        <?php echo wc_price(round($new_total / 3, 2)); ?> po komadu.
+                    Redovna cena promotivnog paketa (3 komada) iznosi <?php echo wc_price($old_total); ?>.<br>
+
+                    Tokom trajanja akcije paket 2+1 prodaje se po ceni od <?php echo wc_price($new_total); ?>.<br>
+
+                    Na fiskalnom računu cena se raspodeljuje na tri proizvoda:
+                    <?php echo wc_price($new_total); ?> ÷ 3 =
+                    <?php echo wc_price(round($new_total / 3, 2)); ?> po komadu.
                     </p>
                 </div>
 
@@ -290,14 +299,14 @@ $image_count = count($images);
         loop: false,
         spaceBetween: 10,
 
-   /* autoplay: {
-        delay: 3000,
-        disableOnInteraction: false,
-    },*/
+        /* autoplay: {
+             delay: 3000,
+             disableOnInteraction: false,
+         },*/
 
         pagination: {
             el: '.swiper-pagination',
-            type: 'progressbar', 
+            type: 'progressbar',
         },
     });
 

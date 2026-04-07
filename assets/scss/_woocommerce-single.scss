@@ -682,9 +682,14 @@
     min-height:220px;
 }
 
-.bundle-product img{
-    max-width:120px;
-    margin-bottom:10px;
+.bundle-product {
+    h4 {
+        display: none;
+    }
+    img {
+        max-width:100%;
+        margin-bottom:0;
+    }
 }
 
 .bundle-flavor{
