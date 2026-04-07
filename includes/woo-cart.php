@@ -72,7 +72,7 @@ function custom_cart_crossells() {
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
                 'field'    => 'term_id',
-                'terms'    => [24],
+                'terms'    => [23,24],
                 'operator' => 'IN',
             ];
         } else {
@@ -91,7 +91,7 @@ function custom_cart_crossells() {
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
                 'field'    => 'term_id',
-                'terms'    => [16,17],
+                'terms'    => [16,17, 23],
                 'operator' => 'IN',
             ];
 
@@ -100,7 +100,7 @@ function custom_cart_crossells() {
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
                 'field'    => 'term_id',
-                'terms'    => [22],
+                'terms'    => [17,23],
                 'operator' => 'NOT IN',
             ];
 
@@ -109,7 +109,7 @@ function custom_cart_crossells() {
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
                 'field'    => 'term_id',
-                'terms'    => [24],
+                'terms'    => [17,23,25],
                 'operator' => 'NOT IN',
             ];
 
