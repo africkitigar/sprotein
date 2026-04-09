@@ -271,7 +271,7 @@ add_action('woocommerce_after_cart', function () {
                 <?php if ($cart_total >= $threshold): ?>
                     <div class="price">
                         <del><?php echo wc_price($product->get_regular_price()); ?></del>
-                        <strong><?php echo wc_price(199); ?></strong>
+                        <strong><?php echo wc_price(899); ?></strong>
                     </div>
                 <?php else: ?>
                     <div class="price">
