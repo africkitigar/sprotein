@@ -249,7 +249,7 @@ add_action('woocommerce_after_cart', function () {
 
         <?php if ($cart_total >= $threshold): ?>
             <h3>🎉 Specijalna ponuda otključana!</h3>
-            <p>Dodaj ovaj proizvod za samo <strong>199 RSD</strong></p>
+            <p>Dodaj ovaj proizvod za samo <strong>899 RSD</strong></p>
 
         <?php endif; ?>
 
