@@ -301,166 +301,6 @@ add_action('woocommerce_after_cart', function () {
 
 
 
-/*
-
-add_action('wp_footer', function () {
-
-    if (!is_cart()) return;
-
-    $target_categories = [17, 22, 23, 24, 25];
-    $present_categories = [];
-
-    foreach (WC()->cart->get_cart() as $cart_item) {
-        $product_id = $cart_item['product_id'];
-
-        foreach ($target_categories as $cat_id) {
-            if (has_term($cat_id, 'product_cat', $product_id)) {
-                $present_categories[] = $cat_id;
-            }
-        }
-    }
-
-    $present_categories = array_unique($present_categories);
-    $missing_categories = array_diff($target_categories, $present_categories);
-
-    $upsell_products = [];
-
-    foreach ($missing_categories as $cat_id) {
-
-        $products = wc_get_products([
-            'limit' => 1,
-            'status' => 'publish',
-            'tax_query' => [
-                [
-                    'taxonomy' => 'product_cat',
-                    'field' => 'term_id',
-                    'terms' => $cat_id,
-                ],
-            ],
-        ]);
-
-        if (!empty($products)) {
-            $p = $products[0];
-
-            $upsell_products[] = [
-                'id' => $p->get_id(),
-                'name' => $p->get_name(),
-                'image' => wp_get_attachment_image_url($p->get_image_id(), 'medium'),
-                'price' => wc_price($p->get_price()),
-            ];
-        }
-    }
-?>
-
-<script>
-window.upsellProducts = <?php echo json_encode($upsell_products); ?>;
-window.shouldShowUpsell = <?php echo empty($missing_categories) ? 'false' : 'true'; ?>;
-</script>
-
-<div class="checkout-upsell-popup" style="display:none;">
-    <div class="overlay"></div>
-    <div class="content">
-        <h3>Preporučujemo uz tvoju kupovinu</h3>
-        <div class="upsell-products"></div>
-        <div class="actions">
-            <button class="continue-checkout button alt">
-                Nastavite na plaćanje
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-jQuery(function ($) {
-
-    let proceedToCheckout = false;
-
-    $('.checkout-button').on('click', function (e) {
-
-        if (proceedToCheckout) return;
-        if (!window.shouldShowUpsell) return;
-
-        e.preventDefault();
-
-        renderUpsellProducts();
-        $('.checkout-upsell-popup').fadeIn();
-    });
-
-    function renderUpsellProducts() {
-
-        let html = '';
-
-        window.upsellProducts.forEach(product => {
-            html += `
-                <div class="upsell-item">
-                    <img src="${product.image}" />
-                    <div>
-                        <h4>${product.name}</h4>
-                        <span>${product.price}</span>
-                    </div>
-                    <button class="add-upsell button" data-id="${product.id}">
-                        Dodaj
-                    </button>
-                </div>
-            `;
-        });
-
-        $('.upsell-products').html(html);
-    }
-
-    // 🔥 ADD TO CART
-// 🔥 ADD TO CART
-$(document).on('click', '.add-upsell', function () {
-
-    const btn = $(this);
-    if (btn.hasClass('added')) return;
-
-    const id = btn.data('id');
-    const item = btn.closest('.upsell-item');
-
-    btn.text('Dodato ✔').prop('disabled', true).addClass('added');
-
-$.ajax({
-    type: 'POST',
-    url: wc_add_to_cart_params.wc_ajax_url.replace('%%endpoint%%', 'add_to_cart'),
-    data: {
-        product_id: id,
-        quantity: 1
-    },
-    complete: function (xhr) {
-        // complete() se poziva uvek - i za success i za error
-        // ne mari za format odgovora
-        item.fadeOut(300, function () {
-            item.remove();
-            if ($('.upsell-item:visible').length === 0) {
-                window.location.href = $('.checkout-button').attr('href');
-            }
-        });
-
-        $(document.body).trigger('wc_fragment_refresh'); // mini cart + fragments
-                        $(document.body).trigger('update_checkout');
-    }
-});
-
-});
-    // 🔥 CONTINUE BUTTON
-$('.continue-checkout').on('click', function () {
-
-    window.location.href = $('.checkout-button').attr('href');
-
-});
-    // CLOSE
-    $('.checkout-upsell-popup .overlay').on('click', function () {
-        $('.checkout-upsell-popup').fadeOut();
-        location.reload();
-    });
-
-});
-</script>
-
-<?php
-});*/
-
 
 add_action('wp_footer', function () {
 
@@ -494,10 +334,17 @@ add_action('wp_footer', function () {
             'limit' => 1,
             'status' => 'publish',
             'tax_query' => [
+                'relation' => 'AND',
                 [
                     'taxonomy' => 'product_cat',
-                    'field' => 'term_id',
-                    'terms' => $cat_id,
+                    'field'    => 'term_id',
+                    'terms'    => $cat_id,
+                ],
+                [
+                    'taxonomy' => 'product_cat',
+                    'field'    => 'term_id',
+                    'terms'    => [79],
+                    'operator' => 'NOT IN',
                 ],
             ],
         ]);
@@ -667,6 +514,13 @@ $(document).on('click', '.add-upsell', function () {
 
 add_action('wp_footer', function(){
     if (!is_checkout()) return;
+
+    // proveri prethodnu stranicu
+    $referrer = wp_get_referer();
+
+    if (!$referrer || strpos($referrer, wc_get_cart_url()) === false) {
+        return;
+    }
 ?>
 <script>
 jQuery(function($){
