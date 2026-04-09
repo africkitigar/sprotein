@@ -1,10 +1,11 @@
 <?php
 
-add_filter( 'woocommerce_currency_symbol', 'change_rsd_currency_symbol', 10, 2 );
+add_filter('woocommerce_currency_symbol', 'change_rsd_currency_symbol', 10, 2);
 
-function change_rsd_currency_symbol( $currency_symbol, $currency ) {
+function change_rsd_currency_symbol($currency_symbol, $currency)
+{
 
-    if ( $currency === 'RSD' ) {
+    if ($currency === 'RSD') {
         $currency_symbol = 'RSD';
     }
 
@@ -14,7 +15,8 @@ function change_rsd_currency_symbol( $currency_symbol, $currency ) {
 
 add_action('woocommerce_after_cart', 'custom_cart_crossells', 5);
 
-function custom_cart_crossells() {
+function custom_cart_crossells()
+{
 
     if (WC()->cart->is_empty()) {
         return;
@@ -29,7 +31,7 @@ function custom_cart_crossells() {
     foreach (WC()->cart->get_cart() as $cart_item) {
         $product_id = $cart_item['product_id'];
 
-        if (has_term([16,17], 'product_cat', $product_id)) {
+        if (has_term([16, 17], 'product_cat', $product_id)) {
             $has_16_17 = true;
         }
 
@@ -52,8 +54,8 @@ function custom_cart_crossells() {
         // UVEK ignorisemo tag 29
         [
             'taxonomy' => 'product_tag',
-            'field'    => 'term_id',
-            'terms'    => [29],
+            'field' => 'term_id',
+            'terms' => [29],
             'operator' => 'NOT IN',
         ]
     ];
@@ -71,15 +73,15 @@ function custom_cart_crossells() {
         if ($has_22) {
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
-                'field'    => 'term_id',
-                'terms'    => [23,24],
+                'field' => 'term_id',
+                'terms' => [23, 24],
                 'operator' => 'IN',
             ];
         } else {
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
-                'field'    => 'term_id',
-                'terms'    => [22,24],
+                'field' => 'term_id',
+                'terms' => [22, 24],
                 'operator' => 'IN',
             ];
         }
@@ -90,8 +92,8 @@ function custom_cart_crossells() {
 
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
-                'field'    => 'term_id',
-                'terms'    => [16,17, 23],
+                'field' => 'term_id',
+                'terms' => [16, 17, 23],
                 'operator' => 'IN',
             ];
 
@@ -99,8 +101,8 @@ function custom_cart_crossells() {
 
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
-                'field'    => 'term_id',
-                'terms'    => [17,23],
+                'field' => 'term_id',
+                'terms' => [17, 23],
                 'operator' => 'NOT IN',
             ];
 
@@ -108,8 +110,8 @@ function custom_cart_crossells() {
 
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
-                'field'    => 'term_id',
-                'terms'    => [17,23,25],
+                'field' => 'term_id',
+                'terms' => [17, 23, 25],
                 'operator' => 'NOT IN',
             ];
 
@@ -117,8 +119,8 @@ function custom_cart_crossells() {
 
             $tax_query[] = [
                 'taxonomy' => 'product_cat',
-                'field'    => 'term_id',
-                'terms'    => [22,23,24],
+                'field' => 'term_id',
+                'terms' => [22, 23, 24],
                 'operator' => 'NOT IN',
             ];
 
@@ -128,11 +130,11 @@ function custom_cart_crossells() {
     }
 
     $args = [
-        'post_type'      => 'product',
+        'post_type' => 'product',
         'posts_per_page' => 4,
-        'orderby'        => 'rand',
-        'post_status'    => 'publish',
-        'tax_query'      => $tax_query,
+        'orderby' => 'rand',
+        'post_status' => 'publish',
+        'tax_query' => $tax_query,
     ];
 
     $query = new WP_Query($args);
@@ -170,20 +172,23 @@ function custom_cart_crossells() {
 
 add_action('woocommerce_before_calculate_totals', function ($cart) {
 
-    if (is_admin() && !defined('DOING_AJAX')) return;
+    if (is_admin() && !defined('DOING_AJAX'))
+        return;
 
     $target_product_id = 619;
     $threshold = 5000;
-    $special_price = 199;
+    $special_price = 899;
 
     $cart_total = 0;
 
     // 1. Izračunaj total BEZ tog proizvoda
     foreach ($cart->get_cart() as $cart_item) {
 
-        if ($cart_item['product_id'] == $target_product_id) continue;
+        if ($cart_item['product_id'] == $target_product_id)
+            continue;
 
-        $cart_total += $cart_item['line_total'];
+        // $cart_total += $cart_item['line_total'];
+        $cart_total += $cart_item['line_total'] ?? 0;
     }
 
     // 2. Ako je >= 5000 → promeni cenu
@@ -223,7 +228,8 @@ add_action('woocommerce_after_cart', function () {
     $cart_total = WC()->cart->get_subtotal();
 
     $product = wc_get_product($target_product_id);
-    if (!$product) return;
+    if (!$product)
+        return;
 
     $in_cart = false;
 
@@ -234,16 +240,17 @@ add_action('woocommerce_after_cart', function () {
         }
     }
 
-    if ($in_cart || $cart_total < $threshold) return;
+    if ($in_cart || $cart_total < $threshold)
+        return;
 
     ?>
-    
+
     <div class="custom-cart-upsell">
 
         <?php if ($cart_total >= $threshold): ?>
             <h3>🎉 Specijalna ponuda otključana!</h3>
             <p>Dodaj ovaj proizvod za samo <strong>199 RSD</strong></p>
-       
+
         <?php endif; ?>
 
         <div class="upsell-product">
@@ -273,8 +280,8 @@ add_action('woocommerce_after_cart', function () {
                 <?php endif; ?>
 
                 <?php if (!$in_cart): ?>
-                    <a href="<?php echo esc_url( add_query_arg('add-to-cart', $target_product_id, wc_get_cart_url()) ); ?>" 
-                    class="button">
+                    <a href="<?php echo esc_url(add_query_arg('add-to-cart', $target_product_id, wc_get_cart_url())); ?>"
+                        class="button">
                         Dodaj u korpu
                     </a>
                 <?php endif; ?>
@@ -289,3 +296,394 @@ add_action('woocommerce_after_cart', function () {
 
     <?php
 }, 3);
+
+
+
+
+
+/*
+
+add_action('wp_footer', function () {
+
+    if (!is_cart()) return;
+
+    $target_categories = [17, 22, 23, 24, 25];
+    $present_categories = [];
+
+    foreach (WC()->cart->get_cart() as $cart_item) {
+        $product_id = $cart_item['product_id'];
+
+        foreach ($target_categories as $cat_id) {
+            if (has_term($cat_id, 'product_cat', $product_id)) {
+                $present_categories[] = $cat_id;
+            }
+        }
+    }
+
+    $present_categories = array_unique($present_categories);
+    $missing_categories = array_diff($target_categories, $present_categories);
+
+    $upsell_products = [];
+
+    foreach ($missing_categories as $cat_id) {
+
+        $products = wc_get_products([
+            'limit' => 1,
+            'status' => 'publish',
+            'tax_query' => [
+                [
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $cat_id,
+                ],
+            ],
+        ]);
+
+        if (!empty($products)) {
+            $p = $products[0];
+
+            $upsell_products[] = [
+                'id' => $p->get_id(),
+                'name' => $p->get_name(),
+                'image' => wp_get_attachment_image_url($p->get_image_id(), 'medium'),
+                'price' => wc_price($p->get_price()),
+            ];
+        }
+    }
+?>
+
+<script>
+window.upsellProducts = <?php echo json_encode($upsell_products); ?>;
+window.shouldShowUpsell = <?php echo empty($missing_categories) ? 'false' : 'true'; ?>;
+</script>
+
+<div class="checkout-upsell-popup" style="display:none;">
+    <div class="overlay"></div>
+    <div class="content">
+        <h3>Preporučujemo uz tvoju kupovinu</h3>
+        <div class="upsell-products"></div>
+        <div class="actions">
+            <button class="continue-checkout button alt">
+                Nastavite na plaćanje
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+jQuery(function ($) {
+
+    let proceedToCheckout = false;
+
+    $('.checkout-button').on('click', function (e) {
+
+        if (proceedToCheckout) return;
+        if (!window.shouldShowUpsell) return;
+
+        e.preventDefault();
+
+        renderUpsellProducts();
+        $('.checkout-upsell-popup').fadeIn();
+    });
+
+    function renderUpsellProducts() {
+
+        let html = '';
+
+        window.upsellProducts.forEach(product => {
+            html += `
+                <div class="upsell-item">
+                    <img src="${product.image}" />
+                    <div>
+                        <h4>${product.name}</h4>
+                        <span>${product.price}</span>
+                    </div>
+                    <button class="add-upsell button" data-id="${product.id}">
+                        Dodaj
+                    </button>
+                </div>
+            `;
+        });
+
+        $('.upsell-products').html(html);
+    }
+
+    // 🔥 ADD TO CART
+// 🔥 ADD TO CART
+$(document).on('click', '.add-upsell', function () {
+
+    const btn = $(this);
+    if (btn.hasClass('added')) return;
+
+    const id = btn.data('id');
+    const item = btn.closest('.upsell-item');
+
+    btn.text('Dodato ✔').prop('disabled', true).addClass('added');
+
+$.ajax({
+    type: 'POST',
+    url: wc_add_to_cart_params.wc_ajax_url.replace('%%endpoint%%', 'add_to_cart'),
+    data: {
+        product_id: id,
+        quantity: 1
+    },
+    complete: function (xhr) {
+        // complete() se poziva uvek - i za success i za error
+        // ne mari za format odgovora
+        item.fadeOut(300, function () {
+            item.remove();
+            if ($('.upsell-item:visible').length === 0) {
+                window.location.href = $('.checkout-button').attr('href');
+            }
+        });
+
+        $(document.body).trigger('wc_fragment_refresh'); // mini cart + fragments
+                        $(document.body).trigger('update_checkout');
+    }
+});
+
+});
+    // 🔥 CONTINUE BUTTON
+$('.continue-checkout').on('click', function () {
+
+    window.location.href = $('.checkout-button').attr('href');
+
+});
+    // CLOSE
+    $('.checkout-upsell-popup .overlay').on('click', function () {
+        $('.checkout-upsell-popup').fadeOut();
+        location.reload();
+    });
+
+});
+</script>
+
+<?php
+});*/
+
+
+add_action('wp_footer', function () {
+
+    if (!is_cart())
+        return;
+
+    $target_categories = [17, 22, 23, 24, 25];
+    $present_categories = [];
+
+    foreach (WC()->cart->get_cart() as $cart_item) {
+        $product_id = $cart_item['product_id'];
+
+        foreach ($target_categories as $cat_id) {
+            if (has_term($cat_id, 'product_cat', $product_id)) {
+                $present_categories[] = $cat_id;
+            }
+        }
+    }
+
+    $present_categories = array_unique($present_categories);
+
+    // kategorije koje NEMA u korpi
+    $missing_categories = array_diff($target_categories, $present_categories);
+
+    // uzmi po 1 proizvod iz svake missing kategorije
+    $upsell_products = [];
+
+    foreach ($missing_categories as $cat_id) {
+
+        $products = wc_get_products([
+            'limit' => 1,
+            'status' => 'publish',
+            'tax_query' => [
+                [
+                    'taxonomy' => 'product_cat',
+                    'field' => 'term_id',
+                    'terms' => $cat_id,
+                ],
+            ],
+        ]);
+
+        if (!empty($products)) {
+            $p = $products[0];
+
+            $upsell_products[] = [
+                'id' => $p->get_id(),
+                'name' => $p->get_name(),
+                'image' => wp_get_attachment_image_url($p->get_image_id(), 'medium'),
+                'price' => wc_price($p->get_price()),
+            ];
+        }
+    }
+
+    ?>
+    <script>
+        window.upsellProducts = <?php echo json_encode($upsell_products); ?>;
+        window.shouldShowUpsell = <?php echo empty($missing_categories) ? 'false' : 'true'; ?>;
+    </script>
+
+    <div class="checkout-upsell-popup" style="display:none;">
+        <div class="overlay"></div>
+
+        <div class="content">
+            <h3>Preporučujemo uz tvoju kupovinu</h3>
+
+            <div class="upsell-products"></div>
+
+            <div class="actions">
+                <button class="continue-checkout button alt">
+                    Nastavite na plaćanje
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        jQuery(function ($) {
+
+            let proceedToCheckout = false;
+
+            $('.checkout-button').on('click', function (e) {
+
+                if (proceedToCheckout) return;
+
+                if (!window.shouldShowUpsell) return;
+
+                e.preventDefault();
+
+                renderUpsellProducts();
+                $('.checkout-upsell-popup').fadeIn();
+
+            });
+
+            function renderUpsellProducts() {
+
+                let html = '';
+
+                window.upsellProducts.forEach(product => {
+
+                    html += `
+                <div class="upsell-item">
+                    <img src="${product.image}" />
+                    <div>
+                    <h4>${product.name}</h4>
+                    <span>${product.price}</span>
+                    </div>
+
+                    <button class="add-upsell button" data-id="${product.id}">
+                        Dodaj
+                    </button>
+                </div>
+            `;
+                });
+
+                $('.upsell-products').html(html);
+            }
+
+            // ADD TO CART (AJAX)
+$(document).on('click', '.add-upsell', function () {
+
+    const btn = $(this);
+
+    if (btn.hasClass('added')) return;
+
+    const id = btn.data('id');
+
+    // ✅ DEFINIŠI item OVDE (bitno!)
+    const item = btn.closest('.upsell-item');
+
+    btn.text('Dodajem...').prop('disabled', true);
+
+    $.ajax({
+        type: 'POST',
+        url: wc_add_to_cart_params.wc_ajax_url.replace('%%endpoint%%', 'add_to_cart'),
+        data: {
+            product_id: id,
+            quantity: 1
+        },
+        success: function () {
+
+            // ✔ vizuelni feedback
+            btn.text('Dodato ✔').addClass('added');
+
+            // ✔ refresh checkout + mini cart
+            $('body').trigger('update_checkout');
+            $('body').trigger('wc_fragment_refresh');
+
+            // ✔ update cart page (KLJUČNO)
+            if ($('body').hasClass('woocommerce-cart')) {
+                $('button[name="update_cart"]').prop('disabled', false).trigger('click');
+            }
+        },
+        complete: function () {
+
+            // ✔ ukloni item iz popup-a
+            setTimeout(function () {
+
+                item.fadeOut(300, function () {
+                    item.remove();
+
+                    // ✔ ako nema više → redirect
+                    if ($('.upsell-item:visible').length === 0) {
+
+                        const checkoutUrl = $('.checkout-button').attr('href');
+
+                        window.location.href = checkoutUrl;
+                    }
+                });
+
+            }, 800);
+        }
+    });
+
+});
+
+            // CONTINUE
+            $('.continue-checkout').on('click', function () {
+
+                proceedToCheckout = true;
+
+                $(document.body).trigger('wc_fragment_refresh'); // mini cart + fragments
+                $(document.body).trigger('update_checkout');
+
+                window.location.href = $('.checkout-button').attr('href');
+
+                // trigger refresh
+                $(document.body).trigger('wc_fragment_refresh');
+
+
+            });
+
+            // CLOSE overlay
+            $('.checkout-upsell-popup .overlay').on('click', function () {
+                $('.checkout-upsell-popup').fadeOut();
+                location.reload();
+            });
+
+        });
+    </script>
+    <?php
+});
+
+
+
+add_action('wp_footer', function(){
+    if (!is_checkout()) return;
+?>
+<script>
+jQuery(function($){
+
+    $(window).on('load', function(){
+
+        setTimeout(function(){
+            $('body').trigger('update_checkout');
+        }, 200);
+
+        setTimeout(function(){
+            $('body').trigger('update_checkout');
+        }, 600);
+
+    });
+
+});
+</script>
+<?php
+});

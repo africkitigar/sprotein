@@ -316,3 +316,141 @@ add_action('woocommerce_review_order_after_order_total', function() {
 add_filter('woocommerce_shipping_package_name', function ($name, $i, $package) {
     return 'Dostava';
 }, 10, 3);
+
+
+
+add_filter('woocommerce_checkout_fields', function($fields){
+
+    if (isset($fields['order']['order_comments'])) {
+        $fields['order']['order_comments']['label'] = 'Napomena u vezi isporuke';
+        $fields['order']['order_comments']['placeholder'] = 'Unesite napomenu za dostavu';
+    }
+
+    return $fields;
+});
+
+
+
+add_filter('woocommerce_checkout_fields', function($fields){
+
+    // Checkbox
+    $fields['order']['delivery_post'] = [
+        'type'     => 'checkbox',
+        'label'    => 'Isporuka u pošti',
+        'required' => false,
+        'class'    => ['form-row-wide'],
+        'priority' => 25,
+    ];
+
+    // Adresa u pošti (skriveno po defaultu)
+    $fields['order']['post_address'] = [
+        'type'        => 'text',
+        'label'       => 'Adresa u pošti',
+        'placeholder' => 'Unesite adresu pošte...',
+        'required'    => false,
+        'class'       => ['form-row-wide', 'hidden-post-field'],
+        'priority'    => 26,
+    ];
+
+    return $fields;
+});
+
+
+add_action('woocommerce_admin_order_data_after_billing_address', function($order){
+
+    $delivery_post = $order->get_meta('Isporuka u pošti');
+    $post_address  = $order->get_meta('Adresa u pošti');
+
+    if ($delivery_post === 'Da') {
+
+        echo '<p><strong>Isporuka:</strong> Pošta</p>';
+
+        if (!empty($post_address)) {
+            echo '<p><strong>Adresa pošte:</strong> ' . esc_html($post_address) . '</p>';
+        }
+    }
+
+});
+
+add_action('woocommerce_after_checkout_form', function(){
+?>
+<div id="post-delivery-note" style="display:none; margin-top:10px;">
+    <small>
+        <strong>Napomena*</strong> Za preuzimanje paketa u pošti biće Vam potrebna lična karta, 
+        te je važno da ime i prezime koje ste naveli bude isto kao u ličnoj karti.
+    </small>
+</div>
+<?php
+});
+
+add_action('wp_footer', function(){
+    if (!is_checkout()) return;
+?>
+<script>
+jQuery(function($){
+
+    function togglePostFields(){
+
+        if($('#delivery_post').is(':checked')){
+            $('.hidden-post-field').show();
+            $('#post-delivery-note').show();
+        } else {
+            $('.hidden-post-field').hide();
+            $('#post-delivery-note').hide();
+        }
+    }
+
+    // init
+    togglePostFields();
+
+    // change
+    $(document).on('change', '#delivery_post', function(){
+        togglePostFields();
+    });
+
+});
+</script>
+<?php
+});
+
+
+add_action('woocommerce_checkout_create_order', function($order, $data){
+
+    if (isset($_POST['delivery_post'])) {
+        $order->update_meta_data('Isporuka u pošti', 'Da');
+    }
+
+    if (!empty($_POST['post_address'])) {
+        $order->update_meta_data('Adresa u pošti', sanitize_text_field($_POST['post_address']));
+    }
+
+}, 10, 2);
+
+add_action('woocommerce_email_order_meta', function($order, $sent_to_admin, $plain_text, $email){
+
+    // samo za processing email kupcu
+    if ($email->id !== 'customer_processing_order') return;
+
+    $delivery_post = $order->get_meta('Isporuka u pošti');
+    $post_address  = $order->get_meta('Adresa u pošti');
+
+    if ($delivery_post === 'Da') {
+
+        if ($plain_text) {
+
+            echo "\n---\n";
+            echo "Isporuka: Pošta\n";
+            echo "Adresa pošte: " . $post_address . "\n";
+
+        } else {
+
+            echo '<h2 style="margin-top:20px;">Detalji isporuke</h2>';
+            echo '<p><strong>Isporuka:</strong> Pošta</p>';
+
+            if (!empty($post_address)) {
+                echo '<p><strong>Adresa pošte:</strong> ' . esc_html($post_address) . '</p>';
+            }
+        }
+    }
+
+}, 20, 4);

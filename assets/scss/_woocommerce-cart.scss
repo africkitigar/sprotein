@@ -288,6 +288,60 @@
 }
 
 @media only screen and (max-width:767px) {
+    .checkout-upsell-popup {
+        .content {
+            padding: 1.6rem!important;
+
+            h3 {
+                font-size: 1.6rem!important;
+            }
+        }
+        .upsell-products {
+            padding: 0!important;
+
+            img {
+                width: 5rem!important;
+            }
+        }
+    }
+    .cart-collaterals h2 {
+        font-size: 1.8rem!important;
+    }
+    .woo-cart .woocommerce-cart-form tbody .product-name a {
+        font-size: 1.2rem!important;
+    }
+    .woocommerce-cart .quantity input {
+        font-size: 1.6rem!important;
+    }
+    .custom-cart-crossells {
+        ul.products.columns-4 {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.6rem;
+
+            li.product {
+                padding: 1.2rem !important;
+
+                h2 {
+                    font-size: 1.5rem!important;
+                }
+
+                .product-categories a {
+                    font-size: 1.2rem!important;
+                }
+
+                .price {
+                    font-size: 1.5rem!important;
+                }
+
+                .button {
+                    font-size: 1.2rem !important;
+                    line-height: 1;
+                    min-height: 3.2rem;
+                    padding: .6rem;
+                }
+            }
+        }
+    }
     .custom-cart-upsell {
         .upsell-product {
             flex-direction: column;
@@ -385,6 +439,81 @@ dl.variation {
             display: inline-flex;
             max-width: 23rem;
             margin-top: 1.6rem;
+        }
+    }
+}
+
+
+
+
+
+
+
+.checkout-upsell-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+}
+
+.checkout-upsell-popup .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+}
+
+.checkout-upsell-popup .content {
+    position: relative;
+    max-width: 70rem;
+    width: 90vw;
+    margin: 60px auto;
+    background: #fff;
+    padding: 2.4rem;
+    border-radius: 1rem;
+
+    h3 {
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    h4 {
+        font-size: 1.4rem;
+        margin: 0!important;
+    }
+
+    .actions {
+        .button {
+            width: 100%;
+        }
+    }
+
+    .upsell-products {
+        .upsell-item {
+            display: flex;
+            gap: 1.6rem;
+            align-items: center;
+            border-bottom: 1px solid $lightgray-color;
+            padding-bottom: 1.2rem;
+            margin-bottom: 1.2rem;
+
+            > div {
+                flex: 1;
+            }
+            img {
+                width: 8rem;
+            }
+
+            .button {
+                min-height: 3.2rem!important;
+                background-color: transparent;
+                border: 1px solid $primary-color!important;
+                font-size: 1.2rem!important;
+
+                &:hover {
+                    background-color: $primary-color;
+                    color: $accent-color;
+                }
+            }
         }
     }
 }

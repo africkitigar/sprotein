@@ -195,8 +195,28 @@ $image_count = count($images);
                     Dodaj u korpu
                 </button>
 
-                <div class="bundle-success" style="display:none;">
-                    Proizvodi su dodati u korpu!
+
+
+                <div class="bundle-popup" style="display:none;">
+                    <div class="bundle-popup-overlay"></div>
+
+                    <div class="bundle-popup-content">
+                        <button class="bundle-popup-close">×</button>
+
+                        <h3>Uspešno dodato u korpu 🎉</h3>
+
+                        <div class="bundle-popup-products"></div>
+
+                        <div class="bundle-popup-actions">
+                            <button class="button-secondary continue-shopping">
+                                Dodaj još proizvoda
+                            </button>
+
+                            <a href="<?php echo wc_get_cart_url(); ?>" class="button alt">
+                                Završi kupovinu
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
             </form>

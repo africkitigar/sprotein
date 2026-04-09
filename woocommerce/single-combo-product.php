@@ -85,7 +85,7 @@ $image_count = count($images);
         <div class="special-header-price">
             <span>Akcijska kombo cena: </span>
             <span class="price-new-wrap">
-                 <?php echo $price_html; ?>
+                <?php echo $price_html; ?>
             </span>
         </div>
 
@@ -113,7 +113,7 @@ $image_count = count($images);
 
         <?php endif; ?>
     </div>
-
+    <?php wc_print_notices(); ?>
     <div class="special-product-grid">
 
         <!-- LEFT -->
@@ -124,51 +124,49 @@ $image_count = count($images);
 
             <form class="cart special-bundle-form combo-form" method="post" enctype="multipart/form-data">
 
-    <input type="hidden" name="add-to-cart" value="<?php echo $product_id; ?>">
+                <input type="hidden" name="add-to-cart" value="<?php echo $product_id; ?>">
 
-    <!-- UKUS 1 -->
-    <div class="select-group">
-        <label>Izaberi proizvod 1</label>
-        <select name="flavor_1" required>
-            <option value="" disabled selected hidden>Izaberite ukus...</option>
+                <!-- UKUS 1 -->
+                <div class="select-group">
+                    <label>Izaberi proizvod 1</label>
+                    <select name="flavor_1" required>
+                        <option value="" disabled selected hidden>Izaberite ukus...</option>
 
-            <?php foreach ($products_1 as $p):
-                $image = wp_get_attachment_image_url($p->get_image_id(), 'medium');
-                $ukus = $p->get_attribute('ukusi');
-            ?>
-                <option value="<?php echo $p->get_id(); ?>"
-                    data-image="<?php echo esc_url($image); ?>"
-                    data-ukus="<?php echo esc_attr($ukus); ?>">
-                    <?php echo $ukus; ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
+                        <?php foreach ($products_1 as $p):
+                            $image = wp_get_attachment_image_url($p->get_image_id(), 'medium');
+                            $ukus = $p->get_attribute('ukusi');
+                            ?>
+                            <option value="<?php echo $p->get_id(); ?>" data-image="<?php echo esc_url($image); ?>"
+                                data-ukus="<?php echo esc_attr($ukus); ?>">
+                                <?php echo $ukus; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-    <!-- UKUS 2 -->
-    <div class="select-group">
-        <label>Izaberi proizvod 2</label>
-        <select name="flavor_2" required>
-            <option value="" disabled selected hidden>Izaberite ukus...</option>
+                <!-- UKUS 2 -->
+                <div class="select-group">
+                    <label>Izaberi proizvod 2</label>
+                    <select name="flavor_2" required>
+                        <option value="" disabled selected hidden>Izaberite ukus...</option>
 
-            <?php foreach ($products_2 as $p):
-                $image = wp_get_attachment_image_url($p->get_image_id(), 'medium');
-                $ukus = $p->get_attribute('ukusi');
-            ?>
-                <option value="<?php echo $p->get_id(); ?>"
-                    data-image="<?php echo esc_url($image); ?>"
-                    data-ukus="<?php echo esc_attr($ukus); ?>">
-                    <?php echo $ukus; ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
+                        <?php foreach ($products_2 as $p):
+                            $image = wp_get_attachment_image_url($p->get_image_id(), 'medium');
+                            $ukus = $p->get_attribute('ukusi');
+                            ?>
+                            <option value="<?php echo $p->get_id(); ?>" data-image="<?php echo esc_url($image); ?>"
+                                data-ukus="<?php echo esc_attr($ukus); ?>">
+                                <?php echo $ukus; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-    <button type="submit" class="single_add_to_cart_button button alt">
-        Dodaj u korpu
-    </button>
+                <button type="submit" class="single_add_to_cart_button button alt">
+                    Dodaj u korpu
+                </button>
 
-</form>
+            </form>
 
         </div>
 
@@ -192,7 +190,7 @@ $image_count = count($images);
             </div>
 
 
-                        <div class="bundle-note">
+            <div class="bundle-note">
 
                 <button class="bundle-note-toggle" type="button">
                     <span class="note-icon">
@@ -265,45 +263,45 @@ $image_count = count($images);
             const wrapper = this.closest('.bundle-note');
             wrapper.classList.toggle('active');
         });
-    });    
-document.addEventListener('DOMContentLoaded', function () {
+    });
+    document.addEventListener('DOMContentLoaded', function () {
 
-    function updateSlot(select, slotNumber) {
+        function updateSlot(select, slotNumber) {
 
-        const option = select.options[select.selectedIndex];
+            const option = select.options[select.selectedIndex];
 
-        const img = option.dataset.image;
-        const ukus = option.dataset.ukus;
+            const img = option.dataset.image;
+            const ukus = option.dataset.ukus;
 
-        const slot = document.querySelector('.bundle-slot[data-slot="' + slotNumber + '"]');
+            const slot = document.querySelector('.bundle-slot[data-slot="' + slotNumber + '"]');
 
-        slot.innerHTML = `
+            slot.innerHTML = `
             <div class="bundle-product">
                 <img src="${img}" alt="">
                 <h4>${ukus}</h4>
             </div>
         `;
-    }
+        }
 
-    const flavor1 = document.querySelector('[name="flavor_1"]');
-    const flavor2 = document.querySelector('[name="flavor_2"]');
+        const flavor1 = document.querySelector('[name="flavor_1"]');
+        const flavor2 = document.querySelector('[name="flavor_2"]');
 
-    flavor1.addEventListener('change', function () {
-        updateSlot(this, 1);
+        flavor1.addEventListener('change', function () {
+            updateSlot(this, 1);
 
-        // blokiraj isti izbor u drugom selectu
-        const val = this.value;
+            // blokiraj isti izbor u drugom selectu
+            const val = this.value;
 
-        document.querySelectorAll('[name="flavor_2"] option').forEach(opt => {
-            opt.disabled = (opt.value === val);
+            document.querySelectorAll('[name="flavor_2"] option').forEach(opt => {
+                opt.disabled = (opt.value === val);
+            });
         });
-    });
 
-    flavor2.addEventListener('change', function () {
-        updateSlot(this, 2);
-    });
+        flavor2.addEventListener('change', function () {
+            updateSlot(this, 2);
+        });
 
-});
+    });
 </script>
 
 <?php get_footer('shop'); ?>
