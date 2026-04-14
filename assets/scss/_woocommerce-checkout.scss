@@ -511,3 +511,12 @@ body.woocommerce-order-pay footer {
         transform: rotate(360deg);
     }
 }
+
+
+.woocommerce-NoticeGroup-checkout {
+    grid-column: 1 / -1;
+
+    ul {
+        list-style: none;
+    }
+}
