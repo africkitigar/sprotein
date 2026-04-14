@@ -105,7 +105,7 @@ function add_custom_acf_product_tabs($tabs)
     if (!empty($sastav)) {
         $tabs['sastav_tab'] = array(
             'title' => __('Sastav', 'woocommerce'),
-            'priority' => 2,
+            'priority' => 23,
             'callback' => 'render_sastav_tab_content'
         );
     }
@@ -113,7 +113,7 @@ function add_custom_acf_product_tabs($tabs)
     if (!empty($nacin_pripreme)) {
         $tabs['nacin_pripreme_tab'] = array(
             'title' => __('Upotreba', 'woocommerce'),
-            'priority' => 3,
+            'priority' => 22,
             'callback' => 'render_nacin_pripreme_tab_content'
         );
     }
@@ -121,7 +121,7 @@ function add_custom_acf_product_tabs($tabs)
     if (!empty($nacin_pripreme)) {
         $tabs['deklaracija_tab'] = array(
             'title' => __('Deklaracija', 'woocommerce'),
-            'priority' => 1,
+            'priority' => 24,
             'callback' => 'render_deklaracija_tab_content'
         );
     }
