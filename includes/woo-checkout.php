@@ -511,3 +511,75 @@ add_filter('body_class', function($classes) {
 
     return $classes;
 });
+
+
+add_action('template_redirect', function () {
+
+    if (!is_order_received_page()) {
+        return;
+    }
+
+    if (!isset($_GET['key'])) {
+        return;
+    }
+
+    $order_id = wc_get_order_id_by_order_key(sanitize_text_field($_GET['key']));
+    if (!$order_id) {
+        return;
+    }
+
+    $order = wc_get_order($order_id);
+    if (!$order) {
+        return;
+    }
+
+    if (isset($_REQUEST['TransId'])) {
+
+        $order->update_meta_data('_intesa_transaction_id', sanitize_text_field($_REQUEST['TransId']));
+        $order->update_meta_data('_intesa_authcode', sanitize_text_field($_REQUEST['AuthCode'] ?? ''));
+        $order->update_meta_data('_intesa_transaction_date', sanitize_text_field($_REQUEST['EXTRA_TRXDATE'] ?? ''));
+
+        $order->save(); // HPOS compatible
+    }
+
+});
+
+
+
+add_action('woocommerce_email_after_order_table', function($order, $sent_to_admin, $plain_text, $email){
+
+    // samo processing email kupcu
+    if ($email->id !== 'customer_processing_order') {
+        return;
+    }
+
+    // samo Intesa kartično plaćanje
+    if ($order->get_payment_method() !== 'npintesa') {
+        return;
+    }
+
+    $transaction_id = $order->get_meta('_intesa_transaction_id');
+    $authcode       = $order->get_meta('_intesa_authcode');
+    $trx_date       = $order->get_meta('_intesa_transaction_date');
+
+    if (!$transaction_id) {
+        return;
+    }
+
+    if ($plain_text) {
+
+        echo "\nPodaci o kartičnoj transakciji\n";
+        echo "Transaction ID: $transaction_id\n";
+        echo "Authcode: $authcode\n";
+        echo "Vreme transakcije: $trx_date\n";
+
+    } else {
+
+        echo '<h2>Podaci o kartičnoj transakciji</h2>';
+        echo '<p><strong>Transaction ID:</strong> '.esc_html($transaction_id).'</p>';
+        echo '<p><strong>Authcode:</strong> '.esc_html($authcode).'</p>';
+        echo '<p><strong>Vreme transakcije:</strong> '.esc_html($trx_date).'</p>';
+
+    }
+
+}, 20, 4);
