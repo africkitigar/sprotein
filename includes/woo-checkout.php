@@ -602,7 +602,7 @@ add_action('template_redirect', function () {
     if (!$order) return;
 
     // Ako već nije failed ili completed
-    if (!$order->has_status(['failed', 'processing', 'completed'])) {
+    if (!$order->has_status(['failed', 'completed'])) {
 
         $order->update_status('failed', 'Intesa redirect: no3d (failed payment)');
 
