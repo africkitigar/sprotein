@@ -450,7 +450,8 @@ body.failed-transaction {
             color: #fff;
         }
 
-        .woocommerce-notice--success {
+        .woocommerce-notice--success,
+        .order_details {
             display: none!important;
         }
     }
