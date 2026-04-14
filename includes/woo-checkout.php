@@ -454,3 +454,60 @@ add_action('woocommerce_email_order_meta', function($order, $sent_to_admin, $pla
     }
 
 }, 20, 4);
+
+
+
+
+
+
+
+
+
+add_action('wp_footer', function () {
+
+    if (!is_wc_endpoint_url('order-pay')) {
+        return;
+    }
+    ?>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const details = document.querySelector('.order_details');
+        if (!details) return;
+
+        // Ako već postoji poruka – ne dodaj opet
+        if (document.querySelector('.intesa-redirect-notice')) return;
+
+        const notice = document.createElement('div');
+        notice.className = 'intesa-redirect-notice';
+        notice.innerHTML = `
+            <div class="intesa-loader"></div>
+            <p>
+                Preusmeravamo vas na siguran portal banke Intesa radi završetka plaćanja.
+                Molimo sačekajte...
+            </p>
+        `;
+
+        details.insertAdjacentElement('afterend', notice);
+
+    });
+    </script>
+
+    <?php
+});
+
+
+
+add_filter('body_class', function($classes) {
+
+    if (is_order_received_page() && isset($_GET['plgresp'])) {
+
+        if ($_GET['plgresp'] === 'no3d') {
+            $classes[] = 'failed-transaction';
+        }
+
+    }
+
+    return $classes;
+});
