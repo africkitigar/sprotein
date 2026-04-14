@@ -451,7 +451,8 @@ body.failed-transaction {
         }
 
         .woocommerce-notice--success,
-        .order_details {
+        .order_details,
+        .woocommerce-thankyou-order-failed-actions {
             display: none!important;
         }
     }
