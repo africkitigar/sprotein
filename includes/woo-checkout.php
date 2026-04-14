@@ -583,3 +583,31 @@ add_action('woocommerce_email_after_order_table', function($order, $sent_to_admi
     }
 
 }, 20, 4);
+
+
+
+add_action('template_redirect', function () {
+
+    // Radi samo na order-received stranici
+    if (!is_order_received_page()) return;
+
+    // Proveri parametar iz Intesa redirecta
+    if (!isset($_GET['plgresp']) || $_GET['plgresp'] !== 'no3d') return;
+
+    // Uzmi order ID iz URL-a
+    $order_id = absint(get_query_var('order-received'));
+    if (!$order_id) return;
+
+    $order = wc_get_order($order_id);
+    if (!$order) return;
+
+    // Ako već nije failed ili completed
+    if (!$order->has_status(['failed', 'processing', 'completed'])) {
+
+        $order->update_status('failed', 'Intesa redirect: no3d (failed payment)');
+
+        // Opcionalno: smanji zalihe ako nisu već
+        wc_maybe_reduce_stock_levels($order_id);
+    }
+
+});
