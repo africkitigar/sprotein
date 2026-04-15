@@ -168,7 +168,7 @@ function custom_cart_crossells()
 
 
 
-
+/*
 
 add_action('woocommerce_before_calculate_totals', function ($cart) {
 
@@ -297,7 +297,7 @@ add_action('woocommerce_after_cart', function () {
     <?php
 }, 3);
 
-
+*/
 
 
 
@@ -307,64 +307,147 @@ add_action('wp_footer', function () {
     if (!is_cart())
         return;
 
-    $target_categories = [17, 22, 23, 24, 25];
-    $present_categories = [];
+    // mapa: kategorija => proizvod koji se izbacuje
+    $rules = [
+        25 => 113,
+        24 => 107,
+        22 => 77,
+        37 => 619
+    ];
+
+    // svi upsell proizvodi koje želiš da prikazuješ
+    $all_upsells = [113, 619, 77, 107];
+
+    // pokupi kategorije iz korpe
+    $cart_categories = [];
 
     foreach (WC()->cart->get_cart() as $cart_item) {
         $product_id = $cart_item['product_id'];
 
-        foreach ($target_categories as $cat_id) {
-            if (has_term($cat_id, 'product_cat', $product_id)) {
-                $present_categories[] = $cat_id;
-            }
+        $terms = wp_get_post_terms($product_id, 'product_cat', ['fields' => 'ids']);
+        if (!empty($terms)) {
+            $cart_categories = array_merge($cart_categories, $terms);
         }
     }
 
-    $present_categories = array_unique($present_categories);
+    $cart_categories = array_unique($cart_categories);
 
-    // kategorije koje NEMA u korpi
-    $missing_categories = array_diff($target_categories, $present_categories);
+    // filtriraj proizvode koje treba izbaciti
+    $filtered_upsells = $all_upsells;
 
-    // uzmi po 1 proizvod iz svake missing kategorije
+    foreach ($rules as $cat_id => $product_id_to_remove) {
+        if (in_array($cat_id, $cart_categories)) {
+            $filtered_upsells = array_diff($filtered_upsells, [$product_id_to_remove]);
+        }
+    }
+
+    // ograniči na max 4 (realno već jeste, ali za svaki slučaj)
+    $filtered_upsells = array_slice($filtered_upsells, 0, 4);
+
+    // sada formiraj podatke za prikaz
     $upsell_products = [];
 
-    foreach ($missing_categories as $cat_id) {
+    foreach ($filtered_upsells as $product_id) {
 
-        $products = wc_get_products([
-            'limit' => 1,
-            'status' => 'publish',
-            'tax_query' => [
-                'relation' => 'AND',
-                [
-                    'taxonomy' => 'product_cat',
-                    'field'    => 'term_id',
-                    'terms'    => $cat_id,
-                ],
-                [
-                    'taxonomy' => 'product_cat',
-                    'field'    => 'term_id',
-                    'terms'    => [79],
-                    'operator' => 'NOT IN',
-                ],
-            ],
-        ]);
-
-        if (!empty($products)) {
-            $p = $products[0];
-
-            $upsell_products[] = [
-                'id' => $p->get_id(),
-                'name' => $p->get_name(),
-                'image' => wp_get_attachment_image_url($p->get_image_id(), 'medium'),
-                'price' => wc_price($p->get_price()),
-            ];
+        // preskoči ako je već u korpi
+        $in_cart = false;
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            if ($cart_item['product_id'] == $product_id) {
+                $in_cart = true;
+                break;
+            }
         }
-    }
 
+        if ($in_cart)
+            continue;
+
+        $product = wc_get_product($product_id);
+        if (!$product)
+            continue;
+
+        // ACF upsell cena
+        $upsell_price = get_field('upsell_cena', $product_id);
+
+        // regularna cena
+        $regular_price = $product->get_regular_price();
+
+        $price_html = '';
+
+        if ($upsell_price && $upsell_price < $regular_price) {
+            $price_html = '<del>' . wc_price($regular_price) . '</del> ';
+            $price_html .= '<ins>' . wc_price($upsell_price) . '</ins>';
+        } else {
+            $price_html = wc_price($product->get_price());
+        }
+
+        $upsell_products[] = [
+            'id' => $product->get_id(),
+            'name' => $product->get_name(),
+            'image' => wp_get_attachment_image_url($product->get_image_id(), 'medium'),
+            'price_html' => $price_html,
+            'upsell_price' => $upsell_price, // bitno za cart
+        ];
+    }
+    /*
+        $target_categories = [17, 22, 23, 24, 25];
+        $present_categories = [];
+
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            $product_id = $cart_item['product_id'];
+
+            foreach ($target_categories as $cat_id) {
+                if (has_term($cat_id, 'product_cat', $product_id)) {
+                    $present_categories[] = $cat_id;
+                }
+            }
+        }
+
+        $present_categories = array_unique($present_categories);
+
+        // kategorije koje NEMA u korpi
+        $missing_categories = array_diff($target_categories, $present_categories);
+
+        // uzmi po 1 proizvod iz svake missing kategorije
+        $upsell_products = [];
+
+        foreach ($missing_categories as $cat_id) {
+
+            $products = wc_get_products([
+                'limit' => 1,
+                'status' => 'publish',
+                'tax_query' => [
+                    'relation' => 'AND',
+                    [
+                        'taxonomy' => 'product_cat',
+                        'field'    => 'term_id',
+                        'terms'    => $cat_id,
+                    ],
+                    [
+                        'taxonomy' => 'product_cat',
+                        'field'    => 'term_id',
+                        'terms'    => [79],
+                        'operator' => 'NOT IN',
+                    ],
+                ],
+            ]);
+
+            if (!empty($products)) {
+                $p = $products[0];
+
+                $upsell_products[] = [
+                    'id' => $p->get_id(),
+                    'name' => $p->get_name(),
+                    'image' => wp_get_attachment_image_url($p->get_image_id(), 'medium'),
+                    'price' => wc_price($p->get_price()),
+                ];
+            }
+        }
+    */
     ?>
     <script>
         window.upsellProducts = <?php echo json_encode($upsell_products); ?>;
-        window.shouldShowUpsell = <?php echo empty($missing_categories) ? 'false' : 'true'; ?>;
+     //   window.shouldShowUpsell = <?php //echo empty($missing_categories) ? 'false' : 'true'; ?>;
+     window.shouldShowUpsell = <?php echo !empty($upsell_products) ? 'true' : 'false'; ?>;
     </script>
 
     <div class="checkout-upsell-popup" style="display:none;">
@@ -383,137 +466,167 @@ add_action('wp_footer', function () {
         </div>
     </div>
 
-    <script>
-        jQuery(function ($) {
+<script>
+jQuery(function ($) {
+console.log($('.upsell-products').length);
+    let proceedToCheckout = false;
 
-            let proceedToCheckout = false;
+    $(document).on('click', '.checkout-button', function (e) {
 
-            $('.checkout-button').on('click', function (e) {
+        if (proceedToCheckout) return;
 
-                if (proceedToCheckout) return;
+        if (!window.shouldShowUpsell) return;
 
-                if (!window.shouldShowUpsell) return;
+        e.preventDefault();
 
-                e.preventDefault();
+        renderUpsellProducts();
+        $('.checkout-upsell-popup').fadeIn();
+    });
 
-                renderUpsellProducts();
-                $('.checkout-upsell-popup').fadeIn();
+    function renderUpsellProducts() {
 
-            });
+        let html = '';
 
-            function renderUpsellProducts() {
-
-                let html = '';
-
-                window.upsellProducts.forEach(product => {
-
-                    html += `
+        window.upsellProducts.forEach(product => {
+            html += `
                 <div class="upsell-item">
                     <img src="${product.image}" />
                     <div>
-                    <h4>${product.name}</h4>
-                    <span>${product.price}</span>
+                        <h4>${product.name}</h4>
+                        <span class="upsell-price">${product.price_html}</span>
                     </div>
 
-                    <button class="add-upsell button" data-id="${product.id}">
+                    <button 
+                        class="add-upsell button" 
+                        data-id="${product.id}" 
+                        data-price="${product.upsell_price}">
                         Dodaj
                     </button>
                 </div>
             `;
-                });
+        });
 
-                $('.upsell-products').html(html);
+        $('.upsell-products').html(html);
+    }
+
+    $(document).on('click', '.add-upsell', function () {
+
+        const btn = $(this);
+
+        if (btn.hasClass('added')) return;
+
+        const id = btn.data('id');
+        const upsellPrice = btn.data('price');
+        const item = btn.closest('.upsell-item');
+
+        btn.text('Dodajem...').prop('disabled', true);
+
+        $.ajax({
+            type: 'POST',
+            url: wc_add_to_cart_params.wc_ajax_url.replace('%%endpoint%%', 'add_to_cart'),
+            data: {
+                product_id: id,
+                quantity: 1,
+                is_upsell: 1
+            },
+            success: function () {
+                btn.text('Dodato ✔').addClass('added');
+
+                $('body').trigger('update_checkout');
+                $('body').trigger('wc_fragment_refresh');
+
+                if ($('body').hasClass('woocommerce-cart')) {
+                    $('button[name="update_cart"]').prop('disabled', false).trigger('click');
+                }
+            },
+            complete: function () {
+                setTimeout(function () {
+                    item.fadeOut(300, function () {
+                        item.remove();
+
+                        if ($('.upsell-item').length === 0) {
+                            const checkoutUrl = $('.checkout-button').attr('href');
+                            window.location.href = checkoutUrl;
+                        }
+                    });
+                }, 800);
             }
+        });
+    });
 
-            // ADD TO CART (AJAX)
-$(document).on('click', '.add-upsell', function () {
+    $(document).on('click', '.continue-checkout', function () {
+        proceedToCheckout = true;
+        window.location.href = $('.checkout-button').attr('href');
+    });
 
-    const btn = $(this);
-
-    if (btn.hasClass('added')) return;
-
-    const id = btn.data('id');
-
-    // ✅ DEFINIŠI item OVDE (bitno!)
-    const item = btn.closest('.upsell-item');
-
-    btn.text('Dodajem...').prop('disabled', true);
-
-    $.ajax({
-        type: 'POST',
-        url: wc_add_to_cart_params.wc_ajax_url.replace('%%endpoint%%', 'add_to_cart'),
-        data: {
-            product_id: id,
-            quantity: 1
-        },
-        success: function () {
-
-            // ✔ vizuelni feedback
-            btn.text('Dodato ✔').addClass('added');
-
-            // ✔ refresh checkout + mini cart
-            $('body').trigger('update_checkout');
-            $('body').trigger('wc_fragment_refresh');
-
-            // ✔ update cart page (KLJUČNO)
-            if ($('body').hasClass('woocommerce-cart')) {
-                $('button[name="update_cart"]').prop('disabled', false).trigger('click');
-            }
-        },
-        complete: function () {
-
-            // ✔ ukloni item iz popup-a
-            setTimeout(function () {
-
-                item.fadeOut(300, function () {
-                    item.remove();
-
-                    // ✔ ako nema više → redirect
-                    if ($('.upsell-item:visible').length === 0) {
-
-                        const checkoutUrl = $('.checkout-button').attr('href');
-
-                        window.location.href = checkoutUrl;
-                    }
-                });
-
-            }, 800);
-        }
+    $(document).on('click', '.checkout-upsell-popup .overlay', function () {
+        $('.checkout-upsell-popup').fadeOut();
     });
 
 });
-
-            // CONTINUE
-            $('.continue-checkout').on('click', function () {
-
-                proceedToCheckout = true;
-
-                $(document.body).trigger('wc_fragment_refresh'); // mini cart + fragments
-                $(document.body).trigger('update_checkout');
-
-                window.location.href = $('.checkout-button').attr('href');
-
-                // trigger refresh
-                $(document.body).trigger('wc_fragment_refresh');
-
-
-            });
-
-            // CLOSE overlay
-            $('.checkout-upsell-popup .overlay').on('click', function () {
-                $('.checkout-upsell-popup').fadeOut();
-                location.reload();
-            });
-
-        });
-    </script>
+</script>
     <?php
 });
 
 
+add_filter('woocommerce_add_cart_item_data', function ($cart_item_data, $product_id, $variation_id) {
 
-add_action('wp_footer', function(){
-    if (!is_checkout()) return;
+    if (isset($_POST['is_upsell']) && (int) $_POST['is_upsell'] === 1) {
+
+        $upsell_price = get_field('upsell_cena', $product_id);
+
+        if ($upsell_price !== '' && $upsell_price !== null) {
+            $cart_item_data['is_upsell'] = true;
+            $cart_item_data['custom_upsell_price'] = (float) $upsell_price;
+
+            // da Woo ne spoji isti proizvod sa regularnim
+            $cart_item_data['unique_key'] = md5(microtime() . rand());
+        }
+    }
+
+    return $cart_item_data;
+
+}, 10, 3);
+
+add_action('woocommerce_before_calculate_totals', function ($cart) {
+
+    if (is_admin() && !defined('DOING_AJAX')) {
+        return;
+    }
+
+    if (empty($cart)) {
+        return;
+    }
+
+    foreach ($cart->get_cart() as $cart_item) {
+        if (isset($cart_item['is_upsell'], $cart_item['custom_upsell_price'])) {
+            $cart_item['data']->set_price((float) $cart_item['custom_upsell_price']);
+        }
+    }
+
+}, 20);
+
+add_filter('woocommerce_get_item_data', function ($item_data, $cart_item) {
+
+    if (isset($cart_item['is_upsell'], $cart_item['custom_upsell_price'])) {
+        $regular_price = $cart_item['data']->get_regular_price();
+
+        if ($regular_price) {
+            $item_data[] = [
+                'name'  => 'Upsell cena',
+                'value' => '<del>' . wc_price($regular_price) . '</del> <ins>' . wc_price($cart_item['custom_upsell_price']) . '</ins>',
+            ];
+        }
+    }
+
+    return $item_data;
+
+}, 10, 2);
+
+
+add_action('wp_footer', function () {
+    if (!is_checkout())
+        return;
 
     // proveri prethodnu stranicu
     $referrer = wp_get_referer();
@@ -521,23 +634,23 @@ add_action('wp_footer', function(){
     if (!$referrer || strpos($referrer, wc_get_cart_url()) === false) {
         return;
     }
-?>
-<script>
-jQuery(function($){
+    ?>
+    <script>
+        jQuery(function ($) {
 
-    $(window).on('load', function(){
+            $(window).on('load', function () {
 
-        setTimeout(function(){
-            $('body').trigger('update_checkout');
-        }, 200);
+                setTimeout(function () {
+                    $('body').trigger('update_checkout');
+                }, 200);
 
-        setTimeout(function(){
-            $('body').trigger('update_checkout');
-        }, 600);
+                setTimeout(function () {
+                    $('body').trigger('update_checkout');
+                }, 600);
 
-    });
+            });
 
-});
-</script>
-<?php
+        });
+    </script>
+    <?php
 });

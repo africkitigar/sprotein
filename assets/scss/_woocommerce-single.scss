@@ -580,9 +580,21 @@
 }
 
 @media only screen and (max-width:767px) {
+    .single-product .woocommerce-notices-wrapper.active .woocommerce-message .bundle-actions button,
+    .single-product .woocommerce-notices-wrapper.active .woocommerce-message .wc-forward {
+        font-size: 1.1rem;
+        line-height: 1.1!important;
+       
+    }
+    .single-product .woocommerce-notices-wrapper.active .woocommerce-message .wc-forward {
+        max-width: 50%!important;
+    }
+    .single-product .woocommerce-notices-wrapper.active .woocommerce-message {
+        gap: 1.2rem!important;
+    }
    .single-product .woocommerce-message {
             display: flex;
-            flex-direction: column;
+          /*  flex-direction: column;*/
             text-align: center;
             gap: 1.6rem;
             font-size: 1.2rem!important;
@@ -841,7 +853,7 @@ header ul:not([class]),
         img {
             max-height: 60rem;
             min-height: 33rem;
-            object-fit: cover;
+            object-fit: contain;
             cursor: grab;
         }
 
@@ -1028,6 +1040,68 @@ header ul:not([class]),
                     background-position: center;
                     aspect-ratio: 3 / 1;
                 }
+            }
+        }
+    }
+}
+
+
+
+
+.single-product {
+    .woocommerce-notices-wrapper:not(.active) {
+        display: none;
+    }
+    .woocommerce-notices-wrapper.active {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, .5);
+        z-index: 2020;
+
+        .woocommerce-message {
+            background-color: #fff!important;
+                border-radius: 10px;
+                margin: 80px auto;
+                max-width: 50rem;
+                padding: 2.4rem;
+                position: relative;
+                text-align: center;
+                width: 90vw;
+                z-index: 2;
+            display: flex;
+            flex-wrap: wrap;
+            position: relative;
+            gap: 2.4rem;
+
+            .wc-forward {
+                order: 3;
+                flex: 1;
+                max-width: calc(50% - 12px);
+            }
+
+            .bundle-actions {
+                flex: 1;
+                max-width: calc(50% - 12px);
+
+                button {
+                    width: 100%;
+                }
+            }
+
+            .bundle-close {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 22px;
+                position: absolute;
+                right: 10px;
+                top: 10px;
             }
         }
     }

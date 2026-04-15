@@ -396,3 +396,78 @@ function custom_category_based_upsells() {
 
 
 
+
+
+add_filter('wc_add_to_cart_message_html', function($message, $products, $show_qty) {
+
+    $cart_url = wc_get_cart_url();
+
+    // zameni Woo dugme
+    $message = preg_replace(
+        '#<a[^>]*class="[^"]*wc-forward[^"]*"[^>]*>.*?</a>#is',
+        '<a href="' . esc_url($cart_url) . '" class="button wc-forward">Završi kupovinu</a>',
+        $message
+    );
+
+    // dodaj X dugme i Nastavi kupovinu
+    $message .= '
+        <button type="button" class="bundle-close">×</button>
+
+        <div class="bundle-actions">
+            <button type="button" class="button-secondary continue-shopping2">
+                Nastavi kupovinu
+            </button>
+        </div>
+    ';
+
+    return $message;
+
+}, 10, 3);
+
+add_action('wp_footer', function () {
+    if (!is_product()) return;
+    ?>
+    <script>
+        jQuery(function($){
+
+    function checkWooPopup() {
+        const $wrapper = $('.woocommerce-notices-wrapper');
+        const $message = $wrapper.find('.woocommerce-message');
+
+        if ($message.length) {
+            $wrapper.addClass('active');
+            $('body').addClass('popup-open');
+        }
+    }
+
+    // pokreni na load (posle reload-a)
+    checkWooPopup();
+
+    // ZATVARANJE
+    $(document).on('click', function(e){
+
+        const $wrapper = $('.woocommerce-notices-wrapper');
+
+        // klik na overlay (wrapper)
+        if ($(e.target).is('.woocommerce-notices-wrapper')) {
+            closePopup();
+        }
+
+    });
+
+    // klik na X ili Nastavi kupovinu
+    $(document).on('click', '.bundle-close, .continue-shopping2', function(e){
+        e.preventDefault();
+        closePopup();
+    });
+
+    function closePopup() {
+        $('.woocommerce-notices-wrapper').removeClass('active');
+        $('body').removeClass('popup-open');
+    }
+
+});
+
+    </script>
+    <?php
+});
