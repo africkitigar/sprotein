@@ -16,6 +16,27 @@ function add_cod_fee( $cart ) {
 
     if ( $chosen_payment_method !== 'cod' ) return;
 
+    // PROVERA FREE SHIPPING
+    $has_free_shipping = false;
+
+    $packages = WC()->shipping()->get_packages();
+
+    if (!empty($packages)) {
+        foreach ($packages as $package) {
+            if (!empty($package['rates'])) {
+                foreach ($package['rates'] as $rate) {
+                    if ($rate->method_id === 'free_shipping') {
+                        $has_free_shipping = true;
+                        break 2;
+                    }
+                }
+            }
+        }
+    }
+
+    // ako ima free shipping → ne dodaj fee
+    if (!$has_free_shipping) return;
+
     $percentage = 0.01;
     $min_fee    = 50;
 
