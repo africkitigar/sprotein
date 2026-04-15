@@ -499,8 +499,18 @@ dl.variation {
             > div {
                 flex: 1;
             }
+            
             img {
                 width: 8rem;
+            }
+
+            .upsell-price {
+                del {
+                    font-size: 1.3rem;
+                }
+                ins {
+                    text-decoration: none!important;
+                }
             }
 
             .button {
