@@ -632,3 +632,17 @@ add_action('template_redirect', function () {
     }
 
 });
+
+
+
+add_filter('gettext', function($translated, $original, $domain) {
+
+    if ($domain === 'woocommerce') {
+        if (strpos($translated, 'uslovi korišćenja') !== false) {
+            $translated = str_replace('uslovi korišćenja', 'uslove korišćenja', $translated);
+        }
+    }
+
+    return $translated;
+
+}, 20, 3);
