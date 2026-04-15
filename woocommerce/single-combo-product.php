@@ -245,15 +245,21 @@ $image_count = count($images);
         loop: false,
         spaceBetween: 10,
 
+        pagination: {
+            el: '.swiper-pagination',
+            type: 'bullets',
+            clickable: true,
+        },
+
         /* autoplay: {
              delay: 3000,
              disableOnInteraction: false,
-         },*/
+         },
 
         pagination: {
             el: '.swiper-pagination',
             type: 'progressbar',
-        },
+        },*/
     });
 
 
