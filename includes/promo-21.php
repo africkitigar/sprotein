@@ -329,12 +329,12 @@ add_action('woocommerce_before_calculate_totals', function ($cart) {
 /**
  * Handle 2+1 discount in cart
  */
-add_action('woocommerce_cart_calculate_fees', function ($cart) {
+/*add_action('woocommerce_cart_calculate_fees', function ($cart) {
 
     if (is_admin() && !defined('DOING_AJAX'))
         return;
 
-    $target_tags = [30, 31, 75];
+    $target_tags = [30, 31, 75, 83];
 
     $total_qty = 0;
     $eligible_items = [];
@@ -387,16 +387,158 @@ add_action('woocommerce_cart_calculate_fees', function ($cart) {
     }
 
 });
+*/
 
 
+add_action('woocommerce_before_calculate_totals', 'custom_2plus1_discount', 20, 1);
+function custom_2plus1_discount($cart) {
+
+    if (is_admin() && !defined('DOING_AJAX')) return;
+
+    $target_tags = [30, 31, 75];
+
+    $eligible_items = [];
+    $total_qty = 0;
+
+    // 1. Reset cena (da ne ostane iz prethodnog refresh-a)
+    foreach ($cart->get_cart() as $cart_item) {
+        if (isset($cart_item['original_price'])) {
+            $cart_item['data']->set_price($cart_item['original_price']);
+        }
+    }
+
+    // 2. Pronađi proizvode u akciji
+    foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
+
+        $product_id = $cart_item['product_id'];
+
+        if (has_term($target_tags, 'product_tag', $product_id)) {
+
+            // sačuvaj original cenu ako nije već
+            if (!isset($cart_item['original_price'])) {
+                $cart->cart_contents[$cart_item_key]['original_price'] = (float) $cart_item['data']->get_price();
+            }
+
+            $eligible_items[$cart_item_key] = $cart_item;
+            $total_qty += $cart_item['quantity'];
+        }
+    }
+
+    if ($total_qty < 3) return;
+
+    // 3. Koliko komada ulazi u akciju
+    $discounted_qty = floor($total_qty / 3) * 3;
+
+    $processed = 0;
+
+    // 4. Primeni popust po artiklu
+    foreach ($eligible_items as $cart_item_key => $cart_item) {
+
+        if ($processed >= $discounted_qty) break;
+
+        $product = $cart_item['data'];
+        $qty = $cart_item['quantity'];
+
+        $remaining = $discounted_qty - $processed;
+        $apply_qty = min($qty, $remaining);
+
+        $original_price = isset($cart_item['original_price'])
+    ? $cart_item['original_price']
+    : (float) $cart_item['data']->get_regular_price();
+
+        // 33.33% popust
+        $discounted_price = $original_price * 0.6667;
+
+        // Ako cela količina ulazi u akciju
+        if ($apply_qty == $qty) {
+            $product->set_price($discounted_price);
+        } else {
+            // SPLIT item (deo sa popustom, deo bez)
+            // Ovo je tricky deo — Woo ne deli automatski item
+            // workaround: primeni prosečnu cenu
+
+            $full_price_part = ($qty - $apply_qty) * $original_price;
+            $discounted_part = $apply_qty * $discounted_price;
+
+            $avg_price = ($full_price_part + $discounted_part) / $qty;
+
+            $product->set_price($avg_price);
+        }
+
+        $processed += $apply_qty;
+    }
+}
 
 
+add_filter('woocommerce_cart_item_price', 'custom_cart_item_price_html', 10, 3);
+function custom_cart_item_price_html($price_html, $cart_item, $cart_item_key) {
+
+    if (!isset($cart_item['original_price'])) {
+        return $price_html;
+    }
+
+    $original_price = (float) $cart_item['original_price'];
+    $current_price  = (float) $cart_item['data']->get_price();
+
+    // Ako nema popusta, ne diraj
+    if ($current_price >= $original_price) {
+        return $price_html;
+    }
+
+    // Formatiraj cene
+    $original = wc_price($original_price);
+    $current  = wc_price($current_price);
+
+    return '<del>' . $original . '</del> <ins>' . $current . '</ins>';
+}
 
 
+function get_2plus1_total_savings() {
+
+    if (!WC()->cart) return 0;
+
+    $total_savings = 0;
+
+    foreach (WC()->cart->get_cart() as $cart_item) {
+
+        if (!isset($cart_item['original_price'])) continue;
+
+        $original_price = (float) $cart_item['original_price'];
+        $current_price  = (float) $cart_item['data']->get_price();
+        $qty            = $cart_item['quantity'];
+
+        if ($current_price < $original_price) {
+            $total_savings += ($original_price - $current_price) * $qty;
+        }
+    }
+
+    return $total_savings;
+}
+
+add_action('woocommerce_cart_totals_before_order_total', function() {
+
+    $savings = get_2plus1_total_savings();
+
+    if ($savings <= 0) return;
+
+    echo '<tr class="order-discount-2plus1">
+        <th>Ušteda (2+1 akcija)</th>
+        <td data-title="Ušteda">-' . wc_price($savings) . '</td>
+    </tr>';
+});
 
 
+add_action('woocommerce_review_order_before_order_total', function() {
 
+    $savings = get_2plus1_total_savings();
 
+    if ($savings <= 0) return;
+
+    echo '<tr class="order-discount-2plus1">
+        <th>Ušteda (2+1 akcija)</th>
+        <td>-' . wc_price($savings) . '</td>
+    </tr>';
+});
 
 
 

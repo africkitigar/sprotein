@@ -590,3 +590,13 @@ function add_excerpts_to_pages() {
     add_post_type_support('page', 'excerpt');
 }
 
+add_action('template_redirect', 'redirect_component_urls_to_home');
+function redirect_component_urls_to_home() {
+
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+    if (strpos($path, '/component/') !== false) {
+        wp_redirect(home_url('/'), 301);
+        exit;
+    }
+}

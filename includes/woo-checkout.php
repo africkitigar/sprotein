@@ -646,3 +646,39 @@ add_filter('gettext', function($translated, $original, $domain) {
     return $translated;
 
 }, 20, 3);
+
+
+
+/** Intesa test - ?intesa_test=1 */
+add_action('template_redirect', function () {
+
+    if (!is_checkout()) return;
+
+    if (!isset($_GET['intesa_test'])) return;
+
+    $product_id = 89;
+
+    if (!WC()->cart) return;
+
+    // Ako već nije u korpi
+    $found = false;
+
+    foreach (WC()->cart->get_cart() as $cart_item) {
+        if ($cart_item['product_id'] == $product_id) {
+            $found = true;
+            break;
+        }
+    }
+
+    if (!$found) {
+        WC()->cart->add_to_cart($product_id);
+    }
+});
+add_filter('body_class', function ($classes) {
+
+    if (isset($_GET['intesa_test'])) {
+        $classes[] = 'intesa-test-mode';
+    }
+
+    return $classes;
+});

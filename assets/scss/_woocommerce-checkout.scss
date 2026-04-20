@@ -526,3 +526,15 @@ body.woocommerce-order-pay footer {
         list-style: none;
     }
 }
+
+
+
+/* default: sakriveno */
+.payment_method_npintesa {
+    display: none !important;
+}
+
+/* kada je test mode: prikazi */
+.intesa-test-mode .payment_method_npintesa {
+    display: block !important;
+}
