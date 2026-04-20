@@ -113,7 +113,9 @@ $image_count = count($images);
 
         <?php endif; ?>
     </div>
+    <div class="woocommerce-notices-wrapper">
     <?php wc_print_notices(); ?>
+    </div>
     <div class="special-product-grid">
 
         <!-- LEFT -->

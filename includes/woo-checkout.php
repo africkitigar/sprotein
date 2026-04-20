@@ -656,7 +656,7 @@ add_action('template_redirect', function () {
 
     if (!isset($_GET['intesa_test'])) return;
 
-    $product_id = 89;
+    $product_id = 601;
 
     if (!WC()->cart) return;
 

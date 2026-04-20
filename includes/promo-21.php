@@ -395,7 +395,7 @@ function custom_2plus1_discount($cart) {
 
     if (is_admin() && !defined('DOING_AJAX')) return;
 
-    $target_tags = [30, 31, 75];
+    $target_tags = [30, 31, 75, 83, 78 ];
 
     $eligible_items = [];
     $total_qty = 0;
