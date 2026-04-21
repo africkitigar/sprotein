@@ -697,7 +697,25 @@ body.menu-open {
     }
     .body-content {
         border-radius: 2.4rem!important;
-        overflow: hidden;
+        /*overflow: hidden;*/
+
+        .header-bottom {
+            border-top-left-radius: 2.4rem;
+            border-top-right-radius: 2.4rem;
+            overflow: hidden;
+            border-top-right-radius: 3.2rem;
+            border-bottom-left-radius: 0;
+
+            .logo {
+                img {
+                    max-width: 6rem;
+                }
+            }
+        }
+        .header-bottom.sticky {
+            border-radius: 0!important;
+        }
+
     }
     .header-promo {
         .header-promo__inner {
