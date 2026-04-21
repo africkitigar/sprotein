@@ -468,6 +468,11 @@
     .header-bottom .sub-menu {
          display: none!important;
      }
+     .header-bottom.sticky {
+        nav {
+             width:calc(100vw - 1.6rem);
+        }
+     }
     .header-bottom {
         padding: 1rem 0!important;
 
@@ -543,7 +548,7 @@
             top: 0;
             left: 0;
             bottom: 0;
-            width: 100vw;
+            width:100vw;
             /*background-color: $primary-color;*/
             background-color: #fff;
             color: $primary-color;
@@ -578,7 +583,7 @@
                 padding-top: 1.6rem;
 
                 > li > a {
-                    font-size: 2rem!important;
+                    font-size: 1.8rem!important;
                 }
             }
 
@@ -702,7 +707,6 @@ body.menu-open {
         .header-bottom {
             border-top-left-radius: 2.4rem;
             border-top-right-radius: 2.4rem;
-            overflow: hidden;
             border-top-right-radius: 3.2rem;
             border-bottom-left-radius: 0;
 
