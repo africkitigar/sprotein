@@ -379,7 +379,7 @@ function custom_category_based_upsells() {
   }
 
   echo '<section class="custom-upsells upsell-products">';
-  echo '<h3 class="custom-upsells__title">Dodaj kreatin za maksimalne rezultate</h3>';
+  echo '<h3 class="custom-upsells__title">Dodaj za maksimalne rezultate</h3>';
   echo '<ul class="custom-upsells__grid products columns-4">';
 
   while ($upsell_query->have_posts()) {

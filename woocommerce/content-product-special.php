@@ -26,7 +26,11 @@ $image_url   = get_the_post_thumbnail_url( $product_id, 'large' );
             <div class="special-banner-content">
 
                 <h2 class="special-banner-title">
-                    <?php echo esc_html( $title ); ?>
+                    <?php 
+                        $title = explode('–', $title)[0];
+                        echo esc_html(trim($title));
+                    ?>
+                    <span>Akcija 2+1 gratis</span>
                 </h2>
 
                 <?php if ( $short_desc ) : ?>

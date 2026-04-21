@@ -1106,3 +1106,12 @@ header ul:not([class]),
         }
     }
 }
+
+
+.special-banner-title {
+    span {
+        display: block;
+        font-weight: 300;
+        padding: 1rem 0 0;
+    }
+}

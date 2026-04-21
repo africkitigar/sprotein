@@ -600,3 +600,36 @@ function redirect_component_urls_to_home() {
         exit;
     }
 }
+
+/** FB pixel code */
+add_action('wp_head', function () {
+
+    // Ako nije production → ne ubacuj pixel
+    if (function_exists('wp_get_environment_type') && wp_get_environment_type() !== 'production') {
+        return;
+    }
+
+    ?>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+
+    fbq('init', '598174970001634');
+    fbq('track', 'PageView');
+    </script>
+
+    <noscript>
+        <img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=598174970001634&ev=PageView&noscript=1"/>
+    </noscript>
+    <!-- End Meta Pixel Code -->
+    <?php
+
+}, 5);
