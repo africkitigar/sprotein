@@ -633,3 +633,18 @@ add_action('wp_head', function () {
     <?php
 
 }, 5);
+
+
+
+
+
+add_action('wp_head', function () {
+    ?>
+    <link rel="icon" href="<?php echo get_site_url(); ?>/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" href="<?php echo get_site_url(); ?>/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="<?php echo get_site_url(); ?>/favicon-192x192.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="<?php echo get_site_url(); ?>/apple-touch-icon.png">
+    <?php
+}, 1);
+
+remove_action('wp_head', 'wp_site_icon', 99);

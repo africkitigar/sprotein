@@ -124,6 +124,7 @@
 
         .card-logos {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: .6rem;
 
@@ -138,8 +139,9 @@
                 opacity: .8;
             }
 
-            img {
-                height: 2.7rem;
+            img,
+            svg {
+                height: 5rem;
             }
         }
 

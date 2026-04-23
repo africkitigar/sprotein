@@ -46,8 +46,8 @@ function add_cod_fee( $cart ) {
         (float) $cart->get_shipping_total() + 
         (float) $cart->get_taxes_total();
 
-    // 🔥 RUČNO izračunaj tvoj 2+1 popust opet
-    $target_tags = [30, 31, 75];
+    // RUČNO izračunaj tvoj 2+1 popust opet
+   /* $target_tags = [30, 31, 75, 83, 78 ];
     $total_qty = 0;
     $eligible_items = [];
 
@@ -86,9 +86,10 @@ function add_cod_fee( $cart ) {
     }
 
     // 🔥 FINAL TOTAL (sa popustom)
-    $final_total = $base_total - $total_savings;
+    $final_total = $base_total - $total_savings;*/
 
-    $fee = $final_total * $percentage;
+    $fee =  $base_total * $percentage;
+    $fee = round($fee);
 
     if ($fee < $min_fee) {
         $fee = $min_fee;
@@ -590,6 +591,7 @@ add_action('woocommerce_email_after_order_table', function($order, $sent_to_admi
     if ($plain_text) {
 
         echo "\nPodaci o kartičnoj transakciji\n";
+        echo "Uspešno izvršeno plaćanje!\n";
         echo "Transaction ID: $transaction_id\n";
         echo "Authcode: $authcode\n";
         echo "Vreme transakcije: $trx_date\n";
@@ -597,6 +599,7 @@ add_action('woocommerce_email_after_order_table', function($order, $sent_to_admi
     } else {
 
         echo '<h2>Podaci o kartičnoj transakciji</h2>';
+        echo "<p>Uspešno izvršeno plaćanje!</p>";
         echo '<p><strong>Transaction ID:</strong> '.esc_html($transaction_id).'</p>';
         echo '<p><strong>Authcode:</strong> '.esc_html($authcode).'</p>';
         echo '<p><strong>Vreme transakcije:</strong> '.esc_html($trx_date).'</p>';

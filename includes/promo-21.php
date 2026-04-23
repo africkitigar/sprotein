@@ -447,7 +447,7 @@ function custom_2plus1_discount($cart) {
     : (float) $cart_item['data']->get_regular_price();
 
         // 33.33% popust
-        $discounted_price = $original_price * 0.6667;
+        $discounted_price = $original_price * 0.666666666;
 
         // Ako cela količina ulazi u akciju
         if ($apply_qty == $qty) {
